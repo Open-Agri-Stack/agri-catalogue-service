@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Verg Local DB",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "verg_db",
+      "Username": "verg_user",
+      "SSLMode": "prefer"
+    }
+  }
+}

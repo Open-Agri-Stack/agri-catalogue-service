@@ -1,0 +1,5 @@
+{
+    "cropvarietyId": {
+        "type": "keyword"
+    }
+}

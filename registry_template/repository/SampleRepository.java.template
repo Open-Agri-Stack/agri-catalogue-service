@@ -1,0 +1,8 @@
+package com.catalogue.verg.{{service_name_lower}}.repository;
+
+import com.catalogue.verg.{{service_name_lower}}.entity.{{service_name_pascal}}Entity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface {{service_name_pascal}}Repository extends JpaRepository<{{service_name_pascal}}Entity, String> {
+
+}

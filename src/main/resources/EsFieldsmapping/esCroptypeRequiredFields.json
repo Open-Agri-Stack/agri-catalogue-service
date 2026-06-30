@@ -1,0 +1,5 @@
+{
+    "croptypeId": {
+        "type": "keyword"
+    }
+}

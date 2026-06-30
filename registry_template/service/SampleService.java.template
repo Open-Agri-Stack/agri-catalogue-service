@@ -1,0 +1,19 @@
+package com.catalogue.verg.{{service_name_lower}}.service;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.catalogue.verg.core.dto.CustomResponse;
+import com.catalogue.verg.core.elasticsearch.dto.SearchCriteria;
+
+
+public interface {{service_name_pascal}}Service {
+
+    CustomResponse create{{service_name_pascal}}(JsonNode {{service_name_camel}}Entity);
+
+    CustomResponse search{{service_name_pascal}}(SearchCriteria searchCriteria);
+
+    CustomResponse assign{{service_name_pascal}}(JsonNode {{service_name_camel}}Entity, String token);
+
+    CustomResponse read(String id);
+
+    CustomResponse delete(String id);
+}

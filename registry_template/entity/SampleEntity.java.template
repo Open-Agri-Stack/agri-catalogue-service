@@ -1,0 +1,37 @@
+package com.catalogue.verg.{{service_name_lower}}.entity;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.sql.Timestamp;
+
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "{{service_name_lower}}")
+@Entity
+public class {{service_name_pascal}}Entity {
+    @Id
+    private String {{service_name_camel}}Id;
+
+    @Type(JsonBinaryType.class)
+    @Column(columnDefinition = "jsonb")
+    private JsonNode data;
+
+    private Timestamp createdOn;
+
+    private Timestamp updatedOn;
+
+    private String status;
+}
