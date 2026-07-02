@@ -1,5 +1,17 @@
 {
-    "livestockId": {
+    "Livestock Id": {
         "type": "keyword"
+    },
+    "Farmer ID": {
+        "type": "keyword"
+    },
+    "Farmer": {
+        "type": "keyword"
+    },
+    "Livestock Type": {
+        "type": "keyword"
+    },
+    "Number": {
+        "type": "integer"
     }
 }

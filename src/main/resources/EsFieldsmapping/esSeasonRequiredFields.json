@@ -1,5 +1,26 @@
 {
-    "seasonId": {
+    "Season Id": {
         "type": "keyword"
+    },
+    "Name": {
+        "type": "keyword"
+    },
+    "Start GC": {
+        "type": "date"
+    },
+    "End GC": {
+        "type": "date"
+    },
+    "Start Month": {
+        "type": "integer"
+    },
+    "Start Day": {
+        "type": "integer"
+    },
+    "End Month": {
+        "type": "integer"
+    },
+    "End Day": {
+        "type": "integer"
     }
 }

@@ -101,3 +101,5 @@ logs/
 # ==== OS files ====
 .DS_Store
 Thumbs.db
+
+registry document/

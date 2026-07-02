@@ -2,12 +2,30 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "livestockId": {
+        "Livestock Id": {
             "type": "string",
-            "description": "description about livestockId"
+            "prefix": "livestock-",
+            "key": "Primary",
+            "description": "livestock information prefix"
+        },
+        "Farmer ID": {
+            "type": "string",
+            "description": "reference to the Farmer record this livestock information belongs to"
+        },
+        "Farmer": {
+            "type": "string"
+        },
+        "Livestock Type": {
+            "type": "string"
+        },
+        "Number": {
+            "type": "integer"
         }
     },
     "required": [
-        "livestockId"
+        "Farmer ID",
+        "Farmer",
+        "Livestock Type",
+        "Number"
     ]
 }

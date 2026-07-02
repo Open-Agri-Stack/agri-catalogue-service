@@ -2,12 +2,22 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "cropcategoryId": {
+        "Crop Category Id": {
             "type": "string",
-            "description": "description about cropcategoryId"
+            "prefix": "cropcategory-",
+            "key": "Primary",
+            "description": "crop category prefix"
+        },
+        "Name": {
+            "type": "string"
+        },
+        "Code": {
+            "type": "string",
+            "description": "Phone number of the lead"
         }
     },
     "required": [
-        "cropcategoryId"
+        "Name",
+        "Code"
     ]
 }

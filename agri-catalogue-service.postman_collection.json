@@ -1,0 +1,591 @@
+{
+  "info": {
+    "name": "Agri Catalogue Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "cropcategory",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"Name\": \"sample string\",\n  \"Code\": \"sample string\"\n}" },
+            "url": { "raw": "{{baseUrl}}/cropcategory/v1/create", "host": ["{{baseUrl}}"], "path": ["cropcategory", "v1", "create"] }
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 0,\n  \"size\": 10\n}" },
+            "url": { "raw": "{{baseUrl}}/cropcategory/v1/search", "host": ["{{baseUrl}}"], "path": ["cropcategory", "v1", "search"] }
+          }
+        },
+        {
+          "name": "read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/cropcategory/v1/read/:id", "host": ["{{baseUrl}}"], "path": ["cropcategory", "v1", "read", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/cropcategory/v1/delete/:id", "host": ["{{baseUrl}}"], "path": ["cropcategory", "v1", "delete", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "import",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "src": "", "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly." } ] },
+            "url": { "raw": "{{baseUrl}}/cropcategory/v1/import", "host": ["{{baseUrl}}"], "path": ["cropcategory", "v1", "import"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "croptype",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": { "raw": "{{baseUrl}}/croptype/v1/create", "host": ["{{baseUrl}}"], "path": ["croptype", "v1", "create"] }
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 0,\n  \"size\": 10\n}" },
+            "url": { "raw": "{{baseUrl}}/croptype/v1/search", "host": ["{{baseUrl}}"], "path": ["croptype", "v1", "search"] }
+          }
+        },
+        {
+          "name": "read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/croptype/v1/read/:id", "host": ["{{baseUrl}}"], "path": ["croptype", "v1", "read", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/croptype/v1/delete/:id", "host": ["{{baseUrl}}"], "path": ["croptype", "v1", "delete", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "import",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "src": "", "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly." } ] },
+            "url": { "raw": "{{baseUrl}}/croptype/v1/import", "host": ["{{baseUrl}}"], "path": ["croptype", "v1", "import"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "cropvariety",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"Name\": \"sample string\",\n  \"Code\": \"sample string\",\n  \"Crop\": \"sample string\"\n}" },
+            "url": { "raw": "{{baseUrl}}/cropvariety/v1/create", "host": ["{{baseUrl}}"], "path": ["cropvariety", "v1", "create"] }
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 0,\n  \"size\": 10\n}" },
+            "url": { "raw": "{{baseUrl}}/cropvariety/v1/search", "host": ["{{baseUrl}}"], "path": ["cropvariety", "v1", "search"] }
+          }
+        },
+        {
+          "name": "read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/cropvariety/v1/read/:id", "host": ["{{baseUrl}}"], "path": ["cropvariety", "v1", "read", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/cropvariety/v1/delete/:id", "host": ["{{baseUrl}}"], "path": ["cropvariety", "v1", "delete", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "import",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "src": "", "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly." } ] },
+            "url": { "raw": "{{baseUrl}}/cropvariety/v1/import", "host": ["{{baseUrl}}"], "path": ["cropvariety", "v1", "import"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "extensionequipment",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"extensionequipmentId\": \"sample string\"\n}" },
+            "url": { "raw": "{{baseUrl}}/extensionequipment/v1/create", "host": ["{{baseUrl}}"], "path": ["extensionequipment", "v1", "create"] }
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 0,\n  \"size\": 10\n}" },
+            "url": { "raw": "{{baseUrl}}/extensionequipment/v1/search", "host": ["{{baseUrl}}"], "path": ["extensionequipment", "v1", "search"] }
+          }
+        },
+        {
+          "name": "read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/extensionequipment/v1/read/:id", "host": ["{{baseUrl}}"], "path": ["extensionequipment", "v1", "read", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/extensionequipment/v1/delete/:id", "host": ["{{baseUrl}}"], "path": ["extensionequipment", "v1", "delete", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "import",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "src": "", "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly." } ] },
+            "url": { "raw": "{{baseUrl}}/extensionequipment/v1/import", "host": ["{{baseUrl}}"], "path": ["extensionequipment", "v1", "import"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "fertilizer",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"fertilizerId\": \"sample string\"\n}" },
+            "url": { "raw": "{{baseUrl}}/fertilizer/v1/create", "host": ["{{baseUrl}}"], "path": ["fertilizer", "v1", "create"] }
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 0,\n  \"size\": 10\n}" },
+            "url": { "raw": "{{baseUrl}}/fertilizer/v1/search", "host": ["{{baseUrl}}"], "path": ["fertilizer", "v1", "search"] }
+          }
+        },
+        {
+          "name": "read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/fertilizer/v1/read/:id", "host": ["{{baseUrl}}"], "path": ["fertilizer", "v1", "read", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/fertilizer/v1/delete/:id", "host": ["{{baseUrl}}"], "path": ["fertilizer", "v1", "delete", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "import",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "src": "", "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly." } ] },
+            "url": { "raw": "{{baseUrl}}/fertilizer/v1/import", "host": ["{{baseUrl}}"], "path": ["fertilizer", "v1", "import"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "insecticide",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"insecticideId\": \"sample string\"\n}" },
+            "url": { "raw": "{{baseUrl}}/insecticide/v1/create", "host": ["{{baseUrl}}"], "path": ["insecticide", "v1", "create"] }
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 0,\n  \"size\": 10\n}" },
+            "url": { "raw": "{{baseUrl}}/insecticide/v1/search", "host": ["{{baseUrl}}"], "path": ["insecticide", "v1", "search"] }
+          }
+        },
+        {
+          "name": "read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/insecticide/v1/read/:id", "host": ["{{baseUrl}}"], "path": ["insecticide", "v1", "read", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/insecticide/v1/delete/:id", "host": ["{{baseUrl}}"], "path": ["insecticide", "v1", "delete", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "import",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "src": "", "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly." } ] },
+            "url": { "raw": "{{baseUrl}}/insecticide/v1/import", "host": ["{{baseUrl}}"], "path": ["insecticide", "v1", "import"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "livestock",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"Farmer ID\": \"sample string\",\n  \"Farmer\": \"sample string\",\n  \"Livestock Type\": \"sample string\",\n  \"Number\": 0\n}" },
+            "url": { "raw": "{{baseUrl}}/livestock/v1/create", "host": ["{{baseUrl}}"], "path": ["livestock", "v1", "create"] }
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 0,\n  \"size\": 10\n}" },
+            "url": { "raw": "{{baseUrl}}/livestock/v1/search", "host": ["{{baseUrl}}"], "path": ["livestock", "v1", "search"] }
+          }
+        },
+        {
+          "name": "read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/livestock/v1/read/:id", "host": ["{{baseUrl}}"], "path": ["livestock", "v1", "read", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/livestock/v1/delete/:id", "host": ["{{baseUrl}}"], "path": ["livestock", "v1", "delete", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "import",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "src": "", "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly." } ] },
+            "url": { "raw": "{{baseUrl}}/livestock/v1/import", "host": ["{{baseUrl}}"], "path": ["livestock", "v1", "import"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "location",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"Farmer ID\": \"sample string\",\n  \"Farmer\": \"sample string\",\n  \"Land ID\": \"sample string\",\n  \"Area In Hectare\": 0,\n  \"Ownership Type\": \"sample string\"\n}" },
+            "url": { "raw": "{{baseUrl}}/location/v1/create", "host": ["{{baseUrl}}"], "path": ["location", "v1", "create"] }
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 0,\n  \"size\": 10\n}" },
+            "url": { "raw": "{{baseUrl}}/location/v1/search", "host": ["{{baseUrl}}"], "path": ["location", "v1", "search"] }
+          }
+        },
+        {
+          "name": "read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/location/v1/read/:id", "host": ["{{baseUrl}}"], "path": ["location", "v1", "read", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/location/v1/delete/:id", "host": ["{{baseUrl}}"], "path": ["location", "v1", "delete", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "import",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "src": "", "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly." } ] },
+            "url": { "raw": "{{baseUrl}}/location/v1/import", "host": ["{{baseUrl}}"], "path": ["location", "v1", "import"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "pesticide",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"pesticideId\": \"sample string\"\n}" },
+            "url": { "raw": "{{baseUrl}}/pesticide/v1/create", "host": ["{{baseUrl}}"], "path": ["pesticide", "v1", "create"] }
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 0,\n  \"size\": 10\n}" },
+            "url": { "raw": "{{baseUrl}}/pesticide/v1/search", "host": ["{{baseUrl}}"], "path": ["pesticide", "v1", "search"] }
+          }
+        },
+        {
+          "name": "read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/pesticide/v1/read/:id", "host": ["{{baseUrl}}"], "path": ["pesticide", "v1", "read", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/pesticide/v1/delete/:id", "host": ["{{baseUrl}}"], "path": ["pesticide", "v1", "delete", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "import",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "src": "", "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly." } ] },
+            "url": { "raw": "{{baseUrl}}/pesticide/v1/import", "host": ["{{baseUrl}}"], "path": ["pesticide", "v1", "import"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "season",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"Name\": \"sample string\",\n  \"Start GC\": \"2023-01-01\",\n  \"End GC\": \"2023-12-31\",\n  \"Start Month\": 1,\n  \"Start Day\": 1,\n  \"End Month\": 12,\n  \"End Day\": 31\n}" },
+            "url": { "raw": "{{baseUrl}}/season/v1/create", "host": ["{{baseUrl}}"], "path": ["season", "v1", "create"] }
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 0,\n  \"size\": 10\n}" },
+            "url": { "raw": "{{baseUrl}}/season/v1/search", "host": ["{{baseUrl}}"], "path": ["season", "v1", "search"] }
+          }
+        },
+        {
+          "name": "read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/season/v1/read/:id", "host": ["{{baseUrl}}"], "path": ["season", "v1", "read", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/season/v1/delete/:id", "host": ["{{baseUrl}}"], "path": ["season", "v1", "delete", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "import",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "src": "", "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly." } ] },
+            "url": { "raw": "{{baseUrl}}/season/v1/import", "host": ["{{baseUrl}}"], "path": ["season", "v1", "import"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "seed",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"seedId\": \"sample string\"\n}" },
+            "url": { "raw": "{{baseUrl}}/seed/v1/create", "host": ["{{baseUrl}}"], "path": ["seed", "v1", "create"] }
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 0,\n  \"size\": 10\n}" },
+            "url": { "raw": "{{baseUrl}}/seed/v1/search", "host": ["{{baseUrl}}"], "path": ["seed", "v1", "search"] }
+          }
+        },
+        {
+          "name": "read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/seed/v1/read/:id", "host": ["{{baseUrl}}"], "path": ["seed", "v1", "read", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/seed/v1/delete/:id", "host": ["{{baseUrl}}"], "path": ["seed", "v1", "delete", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "import",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "src": "", "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly." } ] },
+            "url": { "raw": "{{baseUrl}}/seed/v1/import", "host": ["{{baseUrl}}"], "path": ["seed", "v1", "import"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "soil",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"soilId\": \"sample string\"\n}" },
+            "url": { "raw": "{{baseUrl}}/soil/v1/create", "host": ["{{baseUrl}}"], "path": ["soil", "v1", "create"] }
+          }
+        },
+        {
+          "name": "search",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 0,\n  \"size\": 10\n}" },
+            "url": { "raw": "{{baseUrl}}/soil/v1/search", "host": ["{{baseUrl}}"], "path": ["soil", "v1", "search"] }
+          }
+        },
+        {
+          "name": "read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/soil/v1/read/:id", "host": ["{{baseUrl}}"], "path": ["soil", "v1", "read", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/soil/v1/delete/:id", "host": ["{{baseUrl}}"], "path": ["soil", "v1", "delete", ":id"], "variable": [ { "key": "id", "value": "123" } ] }
+          }
+        },
+        {
+          "name": "import",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file", "src": "", "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly." } ] },
+            "url": { "raw": "{{baseUrl}}/soil/v1/import", "host": ["{{baseUrl}}"], "path": ["soil", "v1", "import"] }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,14 @@
 {
-    "cropvarietyId": {
+    "Crop Variety Id": {
+        "type": "keyword"
+    },
+    "Name": {
+        "type": "keyword"
+    },
+    "Code": {
+        "type": "keyword"
+    },
+    "Crop": {
         "type": "keyword"
     }
 }

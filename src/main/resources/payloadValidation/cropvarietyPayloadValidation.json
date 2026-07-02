@@ -2,12 +2,25 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "cropvarietyId": {
+        "Crop Variety Id": {
             "type": "string",
-            "description": "description about cropvarietyId"
+            "prefix": "cropvariety-",
+            "key": "Primary",
+            "description": "crop variety prefix"
+        },
+        "Name": {
+            "type": "string"
+        },
+        "Code": {
+            "type": "string"
+        },
+        "Crop": {
+            "type": "string"
         }
     },
     "required": [
-        "cropvarietyId"
+        "Name",
+        "Code",
+        "Crop"
     ]
 }

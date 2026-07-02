@@ -1,5 +1,11 @@
 {
-    "cropcategoryId": {
+    "Crop category Id": {
+        "type": "keyword"
+    },
+    "Name": {
+        "type": "keyword"
+    },
+    "Code": {
         "type": "keyword"
     }
 }

@@ -18,6 +18,8 @@ import com.catalogue.verg.core.exception.CustomException;
 import com.catalogue.verg.core.util.Constants;
 import com.catalogue.verg.core.util.PayloadValidation;
 import com.catalogue.verg.core.util.VergProperties;
+import com.catalogue.verg.core.service.ImportService;
+import com.catalogue.verg.core.util.PrimaryKeyUtil;
 import com.catalogue.verg.cropvariety.entity.CropvarietyEntity;
 import com.catalogue.verg.cropvariety.repository.CropvarietyRepository;
 import com.catalogue.verg.cropvariety.service.CropvarietyService;
@@ -30,6 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.util.Map;
@@ -43,6 +46,9 @@ import java.util.concurrent.TimeUnit;
 public class CropvarietyServiceImpl implements CropvarietyService {
     @Autowired
     private PayloadValidation payloadValidation;
+
+    @Autowired
+    private PrimaryKeyUtil primaryKeyUtil;
 
     @Autowired
     private CropvarietyRepository cropvarietyRepository;
@@ -62,6 +68,9 @@ public class CropvarietyServiceImpl implements CropvarietyService {
     @Autowired
     private VergProperties vergProperties;
 
+    @Autowired
+    private ImportService importService;
+
     private Logger logger = LoggerFactory.getLogger(CropvarietyServiceImpl.class);
 
     @Value("${spring.redis.cacheTtl}")
@@ -78,8 +87,7 @@ public class CropvarietyServiceImpl implements CropvarietyService {
             log.info("CropvarietyServiceImpl::createCropvariety:creating cropvariety");
             CropvarietyEntity cropvarietyEntity1 = new CropvarietyEntity();
             // Generate Primary Key
-            UUID idUuid = Uuids.timeBased();
-            String primaryID = String.valueOf(idUuid);
+            String primaryID = primaryKeyUtil.generateKey(Constants.CROPVARIETY_VALIDATION_FILE_JSON);
             cropvarietyEntity1.setCropvarietyId(primaryID);
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
@@ -92,8 +100,7 @@ public class CropvarietyServiceImpl implements CropvarietyService {
 
             log.info("CropvarietyServiceImpl::createCropvariety::persisted cropvariety in postgres");
             ObjectNode jsonNode = objectMapper.createObjectNode();
-            jsonNode.put("CropvarietyID",
-                    cropvarietyEntity.get(Constants.CROPVARIETY_ID_RQST).asText());
+            //            jsonNode.put("status", Constants.ACTIVE);
             jsonNode.setAll((ObjectNode) cropvarietyEntity);
             Map<String, Object> map = objectMapper.convertValue(jsonNode, Map.class);
             esUtilService.addDocument(Constants.CROPVARIETY_INDEX_NAME, Constants.INDEX_TYPE,
@@ -204,6 +211,16 @@ public class CropvarietyServiceImpl implements CropvarietyService {
         response.setParams(new RespParam());
         response.getParams().setStatus(Constants.SUCCESS);
         response.setResponseCode(HttpStatus.OK);
+    }
+
+    @Override
+    public CustomResponse importData(MultipartFile file) {
+        log.info("CropvarietyServiceImpl::importData::started");
+        return importService.processBulkImport(
+                file,
+                Constants.CROPVARIETY_VALIDATION_FILE_JSON,
+                this::createCropvariety
+        );
     }
 
     public String generateRedisJwtTokenKey(Object requestPayload) {

@@ -2,12 +2,43 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "seasonId": {
+        "Season Id": {
             "type": "string",
-            "description": "description about seasonId"
+            "prefix": "season-",
+            "key": "Primary",
+            "description": "season prefix"
+        },
+        "Name": {
+            "type": "string"
+        },
+        "Start GC": {
+            "type": "string",
+            "format": "date"
+        },
+        "End GC": {
+            "type": "string",
+            "format": "date"
+        },
+        "Start Month": {
+            "type": "integer"
+        },
+        "Start Day": {
+            "type": "integer"
+        },
+        "End Month": {
+            "type": "integer"
+        },
+        "End Day": {
+            "type": "integer"
         }
     },
     "required": [
-        "seasonId"
+        "Name",
+        "Start GC",
+        "End GC",
+        "Start Month",
+        "Start Day",
+        "End Month",
+        "End Day"
     ]
 }

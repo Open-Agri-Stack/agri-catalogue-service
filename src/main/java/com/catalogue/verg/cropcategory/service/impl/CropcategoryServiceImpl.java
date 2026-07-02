@@ -18,6 +18,8 @@ import com.catalogue.verg.core.exception.CustomException;
 import com.catalogue.verg.core.util.Constants;
 import com.catalogue.verg.core.util.PayloadValidation;
 import com.catalogue.verg.core.util.VergProperties;
+import com.catalogue.verg.core.service.ImportService;
+import com.catalogue.verg.core.util.PrimaryKeyUtil;
 import com.catalogue.verg.cropcategory.entity.CropcategoryEntity;
 import com.catalogue.verg.cropcategory.repository.CropcategoryRepository;
 import com.catalogue.verg.cropcategory.service.CropcategoryService;
@@ -31,6 +33,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Optional;
@@ -43,6 +47,9 @@ import java.util.concurrent.TimeUnit;
 public class CropcategoryServiceImpl implements CropcategoryService {
     @Autowired
     private PayloadValidation payloadValidation;
+
+    @Autowired
+    private PrimaryKeyUtil primaryKeyUtil;
 
     @Autowired
     private CropcategoryRepository cropcategoryRepository;
@@ -62,6 +69,9 @@ public class CropcategoryServiceImpl implements CropcategoryService {
     @Autowired
     private VergProperties vergProperties;
 
+    @Autowired
+    private ImportService importService;
+
     private Logger logger = LoggerFactory.getLogger(CropcategoryServiceImpl.class);
 
     @Value("${spring.redis.cacheTtl}")
@@ -78,8 +88,7 @@ public class CropcategoryServiceImpl implements CropcategoryService {
             log.info("CropcategoryServiceImpl::createCropcategory:creating cropcategory");
             CropcategoryEntity cropcategoryEntity1 = new CropcategoryEntity();
             // Generate Primary Key
-            UUID idUuid = Uuids.timeBased();
-            String primaryID = String.valueOf(idUuid);
+            String primaryID = primaryKeyUtil.generateKey(Constants.CROPCATEGORY_VALIDATION_FILE_JSON);
             cropcategoryEntity1.setCropcategoryId(primaryID);
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
@@ -92,8 +101,7 @@ public class CropcategoryServiceImpl implements CropcategoryService {
 
             log.info("CropcategoryServiceImpl::createCropcategory::persisted cropcategory in postgres");
             ObjectNode jsonNode = objectMapper.createObjectNode();
-            jsonNode.put("CropcategoryID",
-                    cropcategoryEntity.get(Constants.CROPCATEGORY_ID_RQST).asText());
+//            jsonNode.put("status", Constants.ACTIVE);
             jsonNode.setAll((ObjectNode) cropcategoryEntity);
             Map<String, Object> map = objectMapper.convertValue(jsonNode, Map.class);
             esUtilService.addDocument(Constants.CROPCATEGORY_INDEX_NAME, Constants.INDEX_TYPE,
@@ -197,7 +205,70 @@ public class CropcategoryServiceImpl implements CropcategoryService {
 
     @Override
     public CustomResponse delete(String id) {
-        return null;
+        log.info("CropcategoryServiceImpl::delete:inside the method with id: {}", id);
+        CustomResponse response = new CustomResponse();
+
+        // Validate that the ID is not null or empty
+        if (StringUtils.isEmpty(id)) {
+            log.warn("CropcategoryServiceImpl::delete:id is null or empty");
+            response.setResponseCode(HttpStatus.BAD_REQUEST);
+            response.setMessage(Constants.ID_NOT_FOUND);
+            return response;
+        }
+
+        try {
+            // Check if the entity exists in the database
+            Optional<CropcategoryEntity> entityOptional = cropcategoryRepository.findById(id);
+            if (entityOptional.isEmpty()) {
+                log.warn("CropcategoryServiceImpl::delete:no record found for id: {}", id);
+                response.setResponseCode(HttpStatus.NOT_FOUND);
+                response.setMessage(Constants.INVALID_ID);
+                return response;
+            }
+
+            CropcategoryEntity cropcategoryEntity = entityOptional.get();
+
+            // Check if the entity is already deleted (soft-deleted)
+            if (Constants.IN_ACTIVE.equals(cropcategoryEntity.getStatus())) {
+                log.warn("CropcategoryServiceImpl::delete:record already deleted for id: {}", id);
+                response.setResponseCode(HttpStatus.BAD_REQUEST);
+                response.setMessage("Record is already deleted");
+                return response;
+            }
+
+            // Soft delete: update the status to INACTIVE and set updatedOn timestamp
+            cropcategoryEntity.setStatus(Constants.IN_ACTIVE);
+            cropcategoryEntity.setUpdatedOn(new Timestamp(System.currentTimeMillis()));
+            cropcategoryRepository.save(cropcategoryEntity);
+            log.info("CropcategoryServiceImpl::delete:soft deleted record in postgres for id: {}", id);
+
+            // Remove document from Elasticsearch
+            esUtilService.deleteDocument(id, Constants.CROPCATEGORY_INDEX_NAME);
+            log.info("CropcategoryServiceImpl::delete:deleted document from elasticsearch for id: {}", id);
+
+            // Remove from Redis cache
+            cacheService.deleteCache(id);
+            log.info("CropcategoryServiceImpl::delete:evicted cache for id: {}", id);
+
+            response.setMessage(Constants.SUCCESSFULLY_DELETED);
+            response.setResponseCode(HttpStatus.OK);
+            return response;
+
+        } catch (Exception e) {
+            log.error("CropcategoryServiceImpl::delete:error while deleting record for id: {}", id, e);
+            throw new CustomException(Constants.ERROR, "error while deleting record",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public CustomResponse importData(MultipartFile file) {
+        log.info("CropcategoryServiceImpl::importData::started");
+        return importService.processBulkImport(
+                file,
+                Constants.CROPCATEGORY_VALIDATION_FILE_JSON,
+                this::createCropcategory
+        );
     }
 
     public void createSuccessResponse(CustomResponse response) {

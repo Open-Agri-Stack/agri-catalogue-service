@@ -18,6 +18,8 @@ import com.catalogue.verg.core.exception.CustomException;
 import com.catalogue.verg.core.util.Constants;
 import com.catalogue.verg.core.util.PayloadValidation;
 import com.catalogue.verg.core.util.VergProperties;
+import com.catalogue.verg.core.service.ImportService;
+import com.catalogue.verg.core.util.PrimaryKeyUtil;
 import com.catalogue.verg.croptype.entity.CroptypeEntity;
 import com.catalogue.verg.croptype.repository.CroptypeRepository;
 import com.catalogue.verg.croptype.service.CroptypeService;
@@ -30,6 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.util.Map;
@@ -43,6 +46,9 @@ import java.util.concurrent.TimeUnit;
 public class CroptypeServiceImpl implements CroptypeService {
     @Autowired
     private PayloadValidation payloadValidation;
+
+    @Autowired
+    private PrimaryKeyUtil primaryKeyUtil;
 
     @Autowired
     private CroptypeRepository croptypeRepository;
@@ -62,6 +68,9 @@ public class CroptypeServiceImpl implements CroptypeService {
     @Autowired
     private VergProperties vergProperties;
 
+    @Autowired
+    private ImportService importService;
+
     private Logger logger = LoggerFactory.getLogger(CroptypeServiceImpl.class);
 
     @Value("${spring.redis.cacheTtl}")
@@ -78,8 +87,7 @@ public class CroptypeServiceImpl implements CroptypeService {
             log.info("CroptypeServiceImpl::createCroptype:creating croptype");
             CroptypeEntity croptypeEntity1 = new CroptypeEntity();
             // Generate Primary Key
-            UUID idUuid = Uuids.timeBased();
-            String primaryID = String.valueOf(idUuid);
+            String primaryID = primaryKeyUtil.generateKey(Constants.CROPTYPE_VALIDATION_FILE_JSON);
             croptypeEntity1.setCroptypeId(primaryID);
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
@@ -92,8 +100,7 @@ public class CroptypeServiceImpl implements CroptypeService {
 
             log.info("CroptypeServiceImpl::createCroptype::persisted croptype in postgres");
             ObjectNode jsonNode = objectMapper.createObjectNode();
-            jsonNode.put("CroptypeID",
-                    croptypeEntity.get(Constants.CROPTYPE_ID_RQST).asText());
+            //            jsonNode.put("status", Constants.ACTIVE);
             jsonNode.setAll((ObjectNode) croptypeEntity);
             Map<String, Object> map = objectMapper.convertValue(jsonNode, Map.class);
             esUtilService.addDocument(Constants.CROPTYPE_INDEX_NAME, Constants.INDEX_TYPE,
@@ -204,6 +211,16 @@ public class CroptypeServiceImpl implements CroptypeService {
         response.setParams(new RespParam());
         response.getParams().setStatus(Constants.SUCCESS);
         response.setResponseCode(HttpStatus.OK);
+    }
+
+    @Override
+    public CustomResponse importData(MultipartFile file) {
+        log.info("CroptypeServiceImpl::importData::started");
+        return importService.processBulkImport(
+                file,
+                Constants.CROPTYPE_VALIDATION_FILE_JSON,
+                this::createCroptype
+        );
     }
 
     public String generateRedisJwtTokenKey(Object requestPayload) {

@@ -2,12 +2,44 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "locationId": {
+        "Location Id": {
             "type": "string",
-            "description": "description about locationId"
+            "prefix": "loction-",
+            "key": "Primary",
+            "description": "land information prefix"
+        },
+        "Farmer ID": {
+            "type": "string",
+            "description": "reference to the Farmer record this land information belongs to"
+        },
+        "Farmer": {
+            "type": "string"
+        },
+        "Land ID": {
+            "type": "string"
+        },
+        "Area In Hectare": {
+            "type": "number"
+        },
+        "Ownership Type": {
+            "type": "string"
+        },
+        "Land Kebele is in": {
+            "type": "string"
+        },
+        "Land Certificate": {
+            "type": "string",
+            "description": "filename of uploaded land certificate image/document"
+        },
+        "Remark": {
+            "type": "string"
         }
     },
     "required": [
-        "locationId"
+        "Farmer ID",
+        "Farmer",
+        "Land ID",
+        "Area In Hectare",
+        "Ownership Type"
     ]
 }
