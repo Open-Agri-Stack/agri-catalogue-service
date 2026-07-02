@@ -18,6 +18,7 @@ import com.catalogue.verg.core.exception.CustomException;
 import com.catalogue.verg.core.util.Constants;
 import com.catalogue.verg.core.util.PayloadValidation;
 import com.catalogue.verg.core.util.VergProperties;
+import com.catalogue.verg.core.service.ImportService;
 import com.catalogue.verg.core.util.PrimaryKeyUtil;
 import com.catalogue.verg.seed.entity.SeedEntity;
 import com.catalogue.verg.seed.repository.SeedRepository;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.util.Map;
@@ -65,6 +67,9 @@ public class SeedServiceImpl implements SeedService {
 
     @Autowired
     private VergProperties vergProperties;
+
+    @Autowired
+    private ImportService importService;
 
     private Logger logger = LoggerFactory.getLogger(SeedServiceImpl.class);
 
@@ -206,6 +211,16 @@ public class SeedServiceImpl implements SeedService {
         response.setParams(new RespParam());
         response.getParams().setStatus(Constants.SUCCESS);
         response.setResponseCode(HttpStatus.OK);
+    }
+
+    @Override
+    public CustomResponse importData(MultipartFile file) {
+        log.info("SeedServiceImpl::importData::started");
+        return importService.processBulkImport(
+                file,
+                Constants.SEED_VALIDATION_FILE_JSON,
+                this::createSeed
+        );
     }
 
     public String generateRedisJwtTokenKey(Object requestPayload) {

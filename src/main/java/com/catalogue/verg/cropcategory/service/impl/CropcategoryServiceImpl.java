@@ -18,6 +18,7 @@ import com.catalogue.verg.core.exception.CustomException;
 import com.catalogue.verg.core.util.Constants;
 import com.catalogue.verg.core.util.PayloadValidation;
 import com.catalogue.verg.core.util.VergProperties;
+import com.catalogue.verg.core.service.ImportService;
 import com.catalogue.verg.core.util.PrimaryKeyUtil;
 import com.catalogue.verg.cropcategory.entity.CropcategoryEntity;
 import com.catalogue.verg.cropcategory.repository.CropcategoryRepository;
@@ -31,6 +32,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.util.Map;
@@ -65,6 +68,9 @@ public class CropcategoryServiceImpl implements CropcategoryService {
 
     @Autowired
     private VergProperties vergProperties;
+
+    @Autowired
+    private ImportService importService;
 
     private Logger logger = LoggerFactory.getLogger(CropcategoryServiceImpl.class);
 
@@ -253,6 +259,16 @@ public class CropcategoryServiceImpl implements CropcategoryService {
             throw new CustomException(Constants.ERROR, "error while deleting record",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Override
+    public CustomResponse importData(MultipartFile file) {
+        log.info("CropcategoryServiceImpl::importData::started");
+        return importService.processBulkImport(
+                file,
+                Constants.CROPCATEGORY_VALIDATION_FILE_JSON,
+                this::createCropcategory
+        );
     }
 
     public void createSuccessResponse(CustomResponse response) {

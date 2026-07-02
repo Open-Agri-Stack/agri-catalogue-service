@@ -18,6 +18,7 @@ import com.catalogue.verg.core.exception.CustomException;
 import com.catalogue.verg.core.util.Constants;
 import com.catalogue.verg.core.util.PayloadValidation;
 import com.catalogue.verg.core.util.VergProperties;
+import com.catalogue.verg.core.service.ImportService;
 import com.catalogue.verg.core.util.PrimaryKeyUtil;
 import com.catalogue.verg.location.entity.LocationEntity;
 import com.catalogue.verg.location.repository.LocationRepository;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.util.Map;
@@ -65,6 +67,9 @@ public class LocationServiceImpl implements LocationService {
 
     @Autowired
     private VergProperties vergProperties;
+
+    @Autowired
+    private ImportService importService;
 
     private Logger logger = LoggerFactory.getLogger(LocationServiceImpl.class);
 
@@ -206,6 +211,16 @@ public class LocationServiceImpl implements LocationService {
         response.setParams(new RespParam());
         response.getParams().setStatus(Constants.SUCCESS);
         response.setResponseCode(HttpStatus.OK);
+    }
+
+    @Override
+    public CustomResponse importData(MultipartFile file) {
+        log.info("LocationServiceImpl::importData::started");
+        return importService.processBulkImport(
+                file,
+                Constants.LOCATION_VALIDATION_FILE_JSON,
+                this::createLocation
+        );
     }
 
     public String generateRedisJwtTokenKey(Object requestPayload) {

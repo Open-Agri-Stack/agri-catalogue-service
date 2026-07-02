@@ -18,6 +18,7 @@ import com.catalogue.verg.core.exception.CustomException;
 import com.catalogue.verg.core.util.Constants;
 import com.catalogue.verg.core.util.PayloadValidation;
 import com.catalogue.verg.core.util.VergProperties;
+import com.catalogue.verg.core.service.ImportService;
 import com.catalogue.verg.core.util.PrimaryKeyUtil;
 import com.catalogue.verg.croptype.entity.CroptypeEntity;
 import com.catalogue.verg.croptype.repository.CroptypeRepository;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.util.Map;
@@ -65,6 +67,9 @@ public class CroptypeServiceImpl implements CroptypeService {
 
     @Autowired
     private VergProperties vergProperties;
+
+    @Autowired
+    private ImportService importService;
 
     private Logger logger = LoggerFactory.getLogger(CroptypeServiceImpl.class);
 
@@ -206,6 +211,16 @@ public class CroptypeServiceImpl implements CroptypeService {
         response.setParams(new RespParam());
         response.getParams().setStatus(Constants.SUCCESS);
         response.setResponseCode(HttpStatus.OK);
+    }
+
+    @Override
+    public CustomResponse importData(MultipartFile file) {
+        log.info("CroptypeServiceImpl::importData::started");
+        return importService.processBulkImport(
+                file,
+                Constants.CROPTYPE_VALIDATION_FILE_JSON,
+                this::createCroptype
+        );
     }
 
     public String generateRedisJwtTokenKey(Object requestPayload) {

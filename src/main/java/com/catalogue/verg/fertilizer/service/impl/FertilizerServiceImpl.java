@@ -18,6 +18,7 @@ import com.catalogue.verg.core.exception.CustomException;
 import com.catalogue.verg.core.util.Constants;
 import com.catalogue.verg.core.util.PayloadValidation;
 import com.catalogue.verg.core.util.VergProperties;
+import com.catalogue.verg.core.service.ImportService;
 import com.catalogue.verg.core.util.PrimaryKeyUtil;
 import com.catalogue.verg.fertilizer.entity.FertilizerEntity;
 import com.catalogue.verg.fertilizer.repository.FertilizerRepository;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.util.Map;
@@ -65,6 +67,9 @@ public class FertilizerServiceImpl implements FertilizerService {
 
     @Autowired
     private VergProperties vergProperties;
+
+    @Autowired
+    private ImportService importService;
 
     private Logger logger = LoggerFactory.getLogger(FertilizerServiceImpl.class);
 
@@ -206,6 +211,16 @@ public class FertilizerServiceImpl implements FertilizerService {
         response.setParams(new RespParam());
         response.getParams().setStatus(Constants.SUCCESS);
         response.setResponseCode(HttpStatus.OK);
+    }
+
+    @Override
+    public CustomResponse importData(MultipartFile file) {
+        log.info("FertilizerServiceImpl::importData::started");
+        return importService.processBulkImport(
+                file,
+                Constants.FERTILIZER_VALIDATION_FILE_JSON,
+                this::createFertilizer
+        );
     }
 
     public String generateRedisJwtTokenKey(Object requestPayload) {
