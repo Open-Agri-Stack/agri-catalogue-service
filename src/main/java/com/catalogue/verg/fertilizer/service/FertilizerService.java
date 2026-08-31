@@ -9,34 +9,35 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface FertilizerService {
 
-    CustomResponse createFertilizer(JsonNode fertilizerEntity);
+    // token: the raw Authorization header from the caller
+    CustomResponse createFertilizer(JsonNode fertilizerEntity, String token);
 
     CustomResponse updateFertilizer(String id, JsonNode fertilizerEntity);
 
     // Lifecycle: create an incomplete DRAFT (relaxed validation)
-    CustomResponse draftFertilizer(JsonNode fertilizerEntity);
+    CustomResponse draftFertilizer(JsonNode fertilizerEntity, String token);
 
     // Lifecycle: (re-)submit a DRAFT/REWORK record for approval -> PENDING (full validation)
-    CustomResponse addFertilizer(String id, JsonNode fertilizerEntity);
+    CustomResponse addFertilizer(String id, JsonNode fertilizerEntity, String token);
 
     // Lifecycle: PENDING -> APPROVED | REJECTED | REWORK
-    CustomResponse approveFertilizer(LifecycleRequest request);
+    CustomResponse approveFertilizer(LifecycleRequest request, String token);
 
     // Lifecycle: APPROVED -> ACTIVE(published) | REJECTED | REWORK | PENDING
-    CustomResponse reviewFertilizer(LifecycleRequest request);
+    CustomResponse reviewFertilizer(LifecycleRequest request, String token);
 
     // Toggle a live record between ACTIVE and INACTIVE (rejects any other status)
-    CustomResponse toggleStatus(String id);
+    CustomResponse toggleStatus(String id, String token);
 
-    CustomResponse searchFertilizer(SearchCriteria searchCriteria);
+    CustomResponse searchFertilizer(SearchCriteria searchCriteria, String token);
 
     CustomResponse assignFertilizer(JsonNode fertilizerEntity, String token);
 
-    CustomResponse read(String id);
+    CustomResponse read(String id, String token);
 
-    CustomResponse delete(String id);
+    CustomResponse delete(String id, String token);
 
-    CustomResponse importData(MultipartFile file);
+    CustomResponse importData(MultipartFile file, String token);
 
     // Drops the ES index and rebuilds it from the primary store (Postgres); skips DELETED records
     CustomResponse loadFromPrimaryFertilizer();

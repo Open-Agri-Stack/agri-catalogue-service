@@ -26,47 +26,57 @@ public class LocationobjectController {
 
     //@PostMapping("/v1/create")
     public ResponseEntity<CustomResponse> create(@RequestBody JsonNode locationobjectDetails) {
-        CustomResponse response = locationobjectService.createLocationobject(locationobjectDetails);
+        CustomResponse response = locationobjectService.createLocationobject(locationobjectDetails, null);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Lifecycle: create an incomplete DRAFT (relaxed validation)
     @PostMapping("/v1/draft")
-    public ResponseEntity<CustomResponse> draft(@RequestBody JsonNode locationobjectDetails) {
+    public ResponseEntity<CustomResponse> draft(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody JsonNode locationobjectDetails) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = locationobjectService.draftLocationobject(locationobjectDetails);
+        CustomResponse response = locationobjectService.draftLocationobject(locationobjectDetails, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Creates a new record (full validation). With the lifecycle on it lands PENDING and has
     // to be approved then reviewed; with the lifecycle off it lands ACTIVE straight away.
     @PostMapping("/v1/add")
-    public ResponseEntity<CustomResponse> add(@RequestBody JsonNode locationobjectDetails) {
-        CustomResponse response = locationobjectService.createLocationobject(locationobjectDetails);
+    public ResponseEntity<CustomResponse> add(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody JsonNode locationobjectDetails) {
+        CustomResponse response = locationobjectService.createLocationobject(locationobjectDetails, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Lifecycle: (re-)submit an existing DRAFT/REWORK record for approval (PENDING, full validation)
     @PutMapping("/v1/add/{id}")
-    public ResponseEntity<CustomResponse> addById(@PathVariable String id, @RequestBody JsonNode locationobjectDetails) {
+    public ResponseEntity<CustomResponse> addById(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @PathVariable String id, @RequestBody JsonNode locationobjectDetails) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = locationobjectService.addLocationobject(id, locationobjectDetails);
+        CustomResponse response = locationobjectService.addLocationobject(id, locationobjectDetails, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Lifecycle: PENDING -> APPROVED | REJECTED | REWORK
     @PutMapping("/v1/approve")
-    public ResponseEntity<CustomResponse> approve(@RequestBody LifecycleRequest request) {
+    public ResponseEntity<CustomResponse> approve(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody LifecycleRequest request) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = locationobjectService.approveLocationobject(request);
+        CustomResponse response = locationobjectService.approveLocationobject(request, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Lifecycle: APPROVED -> ACTIVE(published) | REJECTED | REWORK
     @PutMapping("/v1/review")
-    public ResponseEntity<CustomResponse> review(@RequestBody LifecycleRequest request) {
+    public ResponseEntity<CustomResponse> review(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody LifecycleRequest request) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = locationobjectService.reviewLocationobject(request);
+        CustomResponse response = locationobjectService.reviewLocationobject(request, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -74,20 +84,26 @@ public class LocationobjectController {
     // Deliberately NOT gated: plain activate/deactivate, not part of the approval chain, and
     // with the lifecycle off it is the only way to take a record offline short of deleting it.
     @PutMapping("/v1/toggle/{id}")
-    public ResponseEntity<CustomResponse> toggle(@PathVariable String id) {
-        CustomResponse response = locationobjectService.toggleStatus(id);
+    public ResponseEntity<CustomResponse> toggle(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @PathVariable String id) {
+        CustomResponse response = locationobjectService.toggleStatus(id, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     @PostMapping("/v1/search")
-    public ResponseEntity<?> search(@RequestBody SearchCriteria searchCriteria) {
-        CustomResponse response = locationobjectService.searchLocationobject(searchCriteria);
+    public ResponseEntity<?> search(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody SearchCriteria searchCriteria) {
+        CustomResponse response = locationobjectService.searchLocationobject(searchCriteria, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     @GetMapping("/v1/read/{id}")
-    public ResponseEntity<?> read(@PathVariable String id) {
-        CustomResponse response = locationobjectService.read(id);
+    public ResponseEntity<?> read(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @PathVariable String id) {
+        CustomResponse response = locationobjectService.read(id, token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -98,14 +114,18 @@ public class LocationobjectController {
     }
 
     @DeleteMapping("/v1/delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
-        CustomResponse response = locationobjectService.delete(id);
+    public ResponseEntity<?> delete(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @PathVariable String id) {
+        CustomResponse response = locationobjectService.delete(id, token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/v1/import")
-    public ResponseEntity<CustomResponse> importData(@RequestParam("file") MultipartFile file) {
-        CustomResponse response = locationobjectService.importData(file);
+    public ResponseEntity<CustomResponse> importData(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestParam("file") MultipartFile file) {
+        CustomResponse response = locationobjectService.importData(file, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 

@@ -140,6 +140,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -193,6 +197,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -245,6 +253,10 @@
             },
             "method": "PUT",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -306,6 +318,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -359,6 +375,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -410,7 +430,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/cropcategory/v1/toggle/:id",
               "host": [
@@ -457,6 +482,10 @@
             },
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -509,7 +538,12 @@
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/cropcategory/v1/read/:id",
               "host": [
@@ -615,7 +649,12 @@
               ]
             },
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/cropcategory/v1/delete/:id",
               "host": [
@@ -661,7 +700,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -757,6 +801,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -810,6 +858,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -862,6 +914,10 @@
             },
             "method": "PUT",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -923,6 +979,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -976,6 +1036,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -1027,7 +1091,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/croptype/v1/toggle/:id",
               "host": [
@@ -1074,6 +1143,10 @@
             },
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -1126,7 +1199,12 @@
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/croptype/v1/read/:id",
               "host": [
@@ -1232,7 +1310,12 @@
               ]
             },
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/croptype/v1/delete/:id",
               "host": [
@@ -1278,7 +1361,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -1374,6 +1462,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -1427,6 +1519,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -1479,6 +1575,10 @@
             },
             "method": "PUT",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -1540,6 +1640,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -1593,6 +1697,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -1644,7 +1752,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/cropvariety/v1/toggle/:id",
               "host": [
@@ -1692,13 +1805,17 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"filterCriteriaMap\": {\n    \"cropTypeName\": \"Tef (ጤፍ)\",\n    \"year\": \"2006\"\n  },\n  \"pageNumber\": 0,\n  \"pageSize\": 10,\n  \"orderBy\": \"name\",\n  \"orderDirection\": \"asc\",\n  \"facets\": [\n    \"centre\",\n    \"year\"\n  ]\n}",
+              "raw": "{\n  \"filterCriteriaMap\": {\n    \"cropTypeName\": \"Tef (\u1324\u134d)\",\n    \"year\": \"2006\"\n  },\n  \"pageNumber\": 0,\n  \"pageSize\": 10,\n  \"orderBy\": \"name\",\n  \"orderDirection\": \"asc\",\n  \"facets\": [\n    \"centre\",\n    \"year\"\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1743,7 +1860,12 @@
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/cropvariety/v1/read/:id",
               "host": [
@@ -1849,7 +1971,12 @@
               ]
             },
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/cropvariety/v1/delete/:id",
               "host": [
@@ -1895,7 +2022,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -1991,6 +2123,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -2044,6 +2180,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -2096,6 +2236,10 @@
             },
             "method": "PUT",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -2157,6 +2301,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -2210,6 +2358,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -2261,7 +2413,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/extensionequipment/v1/toggle/:id",
               "host": [
@@ -2308,6 +2465,10 @@
             },
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -2360,7 +2521,12 @@
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/extensionequipment/v1/read/:id",
               "host": [
@@ -2466,7 +2632,12 @@
               ]
             },
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/extensionequipment/v1/delete/:id",
               "host": [
@@ -2512,7 +2683,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -2608,6 +2784,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -2661,6 +2841,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -2713,6 +2897,10 @@
             },
             "method": "PUT",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -2774,6 +2962,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -2827,6 +3019,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -2878,7 +3074,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/fertilizer/v1/toggle/:id",
               "host": [
@@ -2925,6 +3126,10 @@
             },
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -2977,7 +3182,12 @@
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/fertilizer/v1/read/:id",
               "host": [
@@ -3083,7 +3293,12 @@
               ]
             },
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/fertilizer/v1/delete/:id",
               "host": [
@@ -3129,7 +3344,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -3225,6 +3445,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -3278,6 +3502,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -3330,6 +3558,10 @@
             },
             "method": "PUT",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -3391,6 +3623,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -3444,6 +3680,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -3495,7 +3735,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/insecticide/v1/toggle/:id",
               "host": [
@@ -3542,6 +3787,10 @@
             },
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -3594,7 +3843,12 @@
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/insecticide/v1/read/:id",
               "host": [
@@ -3700,7 +3954,12 @@
               ]
             },
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/insecticide/v1/delete/:id",
               "host": [
@@ -3746,7 +4005,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -3842,6 +4106,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -3895,6 +4163,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -3947,6 +4219,10 @@
             },
             "method": "PUT",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -4008,6 +4284,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -4061,6 +4341,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -4112,7 +4396,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/livestock/v1/toggle/:id",
               "host": [
@@ -4159,6 +4448,10 @@
             },
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -4211,7 +4504,12 @@
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/livestock/v1/read/:id",
               "host": [
@@ -4317,7 +4615,12 @@
               ]
             },
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/livestock/v1/delete/:id",
               "host": [
@@ -4363,7 +4666,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -4431,6 +4739,1986 @@
       ]
     },
     {
+      "name": "livestockbreed",
+      "item": [
+        {
+          "name": "draft",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"livestockbreedName\": \"Boran\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockbreed/v1/draft",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockbreed",
+                "v1",
+                "draft"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "add-new",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"livestockbreedName\": \"Boran\",\n  \"livestockbreedType\": \"Indigenous\",\n  \"livestockcategoryName\": \"Cattle\",\n  \"livestockcategoryId\": \"livestockcategory-12345\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockbreed/v1/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockbreed",
+                "v1",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "add-promote",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"livestockbreedName\": \"Boran\",\n  \"livestockbreedType\": \"Indigenous\",\n  \"livestockcategoryName\": \"Cattle\",\n  \"livestockcategoryId\": \"livestockcategory-12345\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockbreed/v1/add/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockbreed",
+                "v1",
+                "add",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "approve",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"breed-123456789012\",\n  \"status\": \"APPROVED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockbreed/v1/approve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockbreed",
+                "v1",
+                "approve"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "review",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"breed-123456789012\",\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockbreed/v1/review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockbreed",
+                "v1",
+                "review"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "toggle",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/livestockbreed/v1/toggle/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockbreed",
+                "v1",
+                "toggle",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "search",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filterCriteriaMap\": {\n    \"livestockbreedType\": \"Indigenous\",\n    \"livestockcategoryName\": \"Cattle\"\n  },\n  \"pageNumber\": 0,\n  \"pageSize\": 10,\n  \"orderBy\": \"livestockbreedName\",\n  \"orderDirection\": \"asc\",\n  \"facets\": [\n    \"livestockbreedType\",\n    \"livestockcategoryName\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockbreed/v1/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockbreed",
+                "v1",
+                "search"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "read",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/livestockbreed/v1/read/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockbreed",
+                "v1",
+                "read",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"livestockbreedName\": \"Boran\",\n  \"livestockbreedType\": \"Indigenous\",\n  \"livestockcategoryName\": \"Cattle\",\n  \"livestockcategoryId\": \"livestockcategory-12345\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockbreed/v1/update/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockbreed",
+                "v1",
+                "update",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/livestockbreed/v1/delete/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockbreed",
+                "v1",
+                "delete",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "import",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly."
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockbreed/v1/import",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockbreed",
+                "v1",
+                "import"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "loadFromPrimary",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/livestockbreed/v1/loadFromPrimary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockbreed",
+                "v1",
+                "loadFromPrimary"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "livestockcategory",
+      "item": [
+        {
+          "name": "draft",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Camelid\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockcategory/v1/draft",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockcategory",
+                "v1",
+                "draft"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "add-new",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Camelid\",\n  \"categoryCode\": \"CAM\",\n  \"primaryUtility\": [\n    \"Milk\",\n    \"Meat\"\n  ],\n  \"description\": \"Camels and related species\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockcategory/v1/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockcategory",
+                "v1",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "add-promote",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Camelid\",\n  \"categoryCode\": \"CAM\",\n  \"primaryUtility\": [\n    \"Milk\",\n    \"Meat\"\n  ],\n  \"description\": \"Camels and related species\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockcategory/v1/add/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockcategory",
+                "v1",
+                "add",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "approve",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"livestockcategory-12345\",\n  \"status\": \"APPROVED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockcategory/v1/approve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockcategory",
+                "v1",
+                "approve"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "review",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"livestockcategory-12345\",\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockcategory/v1/review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockcategory",
+                "v1",
+                "review"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "toggle",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/livestockcategory/v1/toggle/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockcategory",
+                "v1",
+                "toggle",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "search",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filterCriteriaMap\": {\n    \"name\": \"Camelid\",\n    \"categoryCode\": \"CAM\"\n  },\n  \"pageNumber\": 0,\n  \"pageSize\": 10,\n  \"orderBy\": \"name\",\n  \"orderDirection\": \"asc\",\n  \"facets\": [\n    \"primaryUtility\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockcategory/v1/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockcategory",
+                "v1",
+                "search"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "read",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/livestockcategory/v1/read/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockcategory",
+                "v1",
+                "read",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Camelid\",\n  \"categoryCode\": \"CAM\",\n  \"primaryUtility\": [\n    \"Milk\",\n    \"Meat\"\n  ],\n  \"description\": \"Camels and related species\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockcategory/v1/update/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockcategory",
+                "v1",
+                "update",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/livestockcategory/v1/delete/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockcategory",
+                "v1",
+                "delete",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "import",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly."
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/livestockcategory/v1/import",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockcategory",
+                "v1",
+                "import"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "loadFromPrimary",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/livestockcategory/v1/loadFromPrimary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "livestockcategory",
+                "v1",
+                "loadFromPrimary"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "locationconfig",
+      "item": [
+        {
+          "name": "draft",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"locationLabel\": \"District\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/locationconfig/v1/draft",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "locationconfig",
+                "v1",
+                "draft"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "add-new",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"locationLabel\": \"District\",\n  \"locationOrder\": \"3\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/locationconfig/v1/add",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "locationconfig",
+                "v1",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "add-promote",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"locationLabel\": \"District\",\n  \"locationOrder\": \"3\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/locationconfig/v1/add/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "locationconfig",
+                "v1",
+                "add",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "approve",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"locationconfig-123456789012\",\n  \"status\": \"APPROVED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/locationconfig/v1/approve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "locationconfig",
+                "v1",
+                "approve"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "review",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"locationconfig-123456789012\",\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/locationconfig/v1/review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "locationconfig",
+                "v1",
+                "review"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "toggle",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/locationconfig/v1/toggle/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "locationconfig",
+                "v1",
+                "toggle",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "search",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filterCriteriaMap\": {\n    \"locationLabel\": \"District\"\n  },\n  \"pageNumber\": 0,\n  \"pageSize\": 10,\n  \"orderBy\": \"locationOrder\",\n  \"orderDirection\": \"asc\",\n  \"facets\": [\n    \"locationLabel\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/locationconfig/v1/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "locationconfig",
+                "v1",
+                "search"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "read",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/locationconfig/v1/read/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "locationconfig",
+                "v1",
+                "read",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"locationLabel\": \"District\",\n  \"locationOrder\": \"3\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/locationconfig/v1/update/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "locationconfig",
+                "v1",
+                "update",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/locationconfig/v1/delete/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "locationconfig",
+                "v1",
+                "delete",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "import",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly."
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/locationconfig/v1/import",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "locationconfig",
+                "v1",
+                "import"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "loadFromPrimary",
+          "request": {
+            "auth": {
+              "type": "apikey",
+              "apikey": [
+                {
+                  "key": "key",
+                  "value": "apikey",
+                  "type": "string"
+                },
+                {
+                  "key": "value",
+                  "value": "{{api_key}}",
+                  "type": "string"
+                },
+                {
+                  "key": "in",
+                  "value": "header",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/locationconfig/v1/loadFromPrimary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "locationconfig",
+                "v1",
+                "loadFromPrimary"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "locationmapper",
       "item": [
         {
@@ -4458,6 +6746,10 @@
             },
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -4512,6 +6804,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -4564,6 +6860,10 @@
             },
             "method": "PUT",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -4625,6 +6925,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -4678,6 +6982,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -4729,7 +7037,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/locationmapper/v1/toggle/:id",
               "host": [
@@ -4776,6 +7089,10 @@
             },
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -4828,7 +7145,12 @@
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/locationmapper/v1/read/:id",
               "host": [
@@ -4934,7 +7256,12 @@
               ]
             },
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/locationmapper/v1/delete/:id",
               "host": [
@@ -4980,7 +7307,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -5076,6 +7408,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -5129,6 +7465,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -5181,6 +7521,10 @@
             },
             "method": "PUT",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -5242,6 +7586,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -5295,6 +7643,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -5346,7 +7698,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/locationobject/v1/toggle/:id",
               "host": [
@@ -5393,6 +7750,10 @@
             },
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -5445,7 +7806,12 @@
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/locationobject/v1/read/:id",
               "host": [
@@ -5551,7 +7917,12 @@
               ]
             },
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/locationobject/v1/delete/:id",
               "host": [
@@ -5597,7 +7968,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -5693,6 +8069,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -5746,6 +8126,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -5798,6 +8182,10 @@
             },
             "method": "PUT",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -5859,6 +8247,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -5912,6 +8304,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -5963,7 +8359,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/marketplace/v1/toggle/:id",
               "host": [
@@ -6010,6 +8411,10 @@
             },
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -6062,7 +8467,12 @@
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/marketplace/v1/read/:id",
               "host": [
@@ -6168,7 +8578,12 @@
               ]
             },
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/marketplace/v1/delete/:id",
               "host": [
@@ -6214,7 +8629,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -6310,6 +8730,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -6363,6 +8787,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -6415,6 +8843,10 @@
             },
             "method": "PUT",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -6476,6 +8908,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -6529,6 +8965,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -6580,7 +9020,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/pesticide/v1/toggle/:id",
               "host": [
@@ -6627,6 +9072,10 @@
             },
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -6679,7 +9128,12 @@
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/pesticide/v1/read/:id",
               "host": [
@@ -6785,7 +9239,12 @@
               ]
             },
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/pesticide/v1/delete/:id",
               "host": [
@@ -6831,7 +9290,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -6927,6 +9391,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -6980,6 +9448,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -7032,6 +9504,10 @@
             },
             "method": "PUT",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -7093,6 +9569,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -7146,6 +9626,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -7197,7 +9681,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/season/v1/toggle/:id",
               "host": [
@@ -7244,6 +9733,10 @@
             },
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -7296,7 +9789,12 @@
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/season/v1/read/:id",
               "host": [
@@ -7402,7 +9900,12 @@
               ]
             },
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/season/v1/delete/:id",
               "host": [
@@ -7448,7 +9951,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -7544,6 +10052,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -7597,6 +10109,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -7649,6 +10165,10 @@
             },
             "method": "PUT",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -7710,6 +10230,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -7763,6 +10287,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -7814,7 +10342,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/seed/v1/toggle/:id",
               "host": [
@@ -7861,6 +10394,10 @@
             },
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -7913,7 +10450,12 @@
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/seed/v1/read/:id",
               "host": [
@@ -8019,7 +10561,12 @@
               ]
             },
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/seed/v1/delete/:id",
               "host": [
@@ -8065,7 +10612,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -8161,6 +10713,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -8214,6 +10770,10 @@
             "method": "POST",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -8266,6 +10826,10 @@
             },
             "method": "PUT",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -8327,6 +10891,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -8380,6 +10948,10 @@
             "method": "PUT",
             "header": [
               {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
+              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -8431,7 +11003,12 @@
               ]
             },
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/soil/v1/toggle/:id",
               "host": [
@@ -8478,6 +11055,10 @@
             },
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -8530,7 +11111,12 @@
               ]
             },
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/soil/v1/read/:id",
               "host": [
@@ -8636,7 +11222,12 @@
               ]
             },
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/soil/v1/delete/:id",
               "host": [
@@ -8682,7 +11273,12 @@
               ]
             },
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt}}"
+              }
+            ],
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -8782,6 +11378,11 @@
     {
       "key": "api_key",
       "value": ""
+    },
+    {
+      "key": "jwt",
+      "value": "",
+      "type": "string"
     }
   ]
 }

@@ -9,34 +9,35 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface CropvarietyService {
 
-    CustomResponse createCropvariety(JsonNode cropvarietyEntity);
+    // token: the raw Authorization header from the caller
+    CustomResponse createCropvariety(JsonNode cropvarietyEntity, String token);
 
     CustomResponse updateCropvariety(String id, JsonNode cropvarietyEntity);
 
     // Lifecycle: create an incomplete DRAFT (relaxed validation)
-    CustomResponse draftCropvariety(JsonNode cropvarietyEntity);
+    CustomResponse draftCropvariety(JsonNode cropvarietyEntity, String token);
 
     // Lifecycle: (re-)submit a DRAFT/REWORK record for approval -> PENDING (full validation)
-    CustomResponse addCropvariety(String id, JsonNode cropvarietyEntity);
+    CustomResponse addCropvariety(String id, JsonNode cropvarietyEntity, String token);
 
     // Lifecycle: PENDING -> APPROVED | REJECTED | REWORK
-    CustomResponse approveCropvariety(LifecycleRequest request);
+    CustomResponse approveCropvariety(LifecycleRequest request, String token);
 
     // Lifecycle: APPROVED -> ACTIVE(published) | REJECTED | REWORK | PENDING
-    CustomResponse reviewCropvariety(LifecycleRequest request);
+    CustomResponse reviewCropvariety(LifecycleRequest request, String token);
 
     // Toggle a live record between ACTIVE and INACTIVE (rejects any other status)
-    CustomResponse toggleStatus(String id);
+    CustomResponse toggleStatus(String id, String token);
 
-    CustomResponse searchCropvariety(SearchCriteria searchCriteria);
+    CustomResponse searchCropvariety(SearchCriteria searchCriteria, String token);
 
     CustomResponse assignCropvariety(JsonNode cropvarietyEntity, String token);
 
-    CustomResponse read(String id);
+    CustomResponse read(String id, String token);
 
-    CustomResponse delete(String id);
+    CustomResponse delete(String id, String token);
 
-    CustomResponse importData(MultipartFile file);
+    CustomResponse importData(MultipartFile file, String token);
 
     // Drops the ES index and rebuilds it from the primary store (Postgres); skips DELETED records
     CustomResponse loadFromPrimaryCropvariety();

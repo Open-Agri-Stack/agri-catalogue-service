@@ -105,6 +105,7 @@ Thumbs.db
 
 #===== venv files ====
 .venv/
+__pycache__/
 
 
 #===== ref files ====

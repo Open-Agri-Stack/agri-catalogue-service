@@ -22,6 +22,7 @@ import com.catalogue.verg.core.util.LifecycleUtil;
 import com.catalogue.verg.core.util.PayloadValidation;
 import com.catalogue.verg.core.util.VergProperties;
 import com.catalogue.verg.core.service.AuditLogService;
+import com.catalogue.verg.core.service.AuthValidationService;
 import com.catalogue.verg.core.service.ImportService;
 import com.catalogue.verg.core.service.LoadFromPrimaryService;
 import com.catalogue.verg.core.util.PrimaryKeyUtil;
@@ -91,11 +92,14 @@ public class LivestockServiceImpl implements LivestockService {
     private LifecyclePolicy lifecyclePolicy;
 
     private final NotificationUtil notificationUtil;
+    @Autowired
+    private AuthValidationService authValidationService;
+
     /**
      * Catalogue name recorded on every audit row emitted by this service. Doubles as the key
      * this catalogue is looked up by in the lifecycle switches ({@link LifecyclePolicy}).
      */
-    private static final String AUDIT_ENTITY_NAME = "livestock";
+    private static final String CATALOGUE_NAME = "livestock";
 
     private Logger logger = LoggerFactory.getLogger(LivestockServiceImpl.class);
 
@@ -107,8 +111,12 @@ public class LivestockServiceImpl implements LivestockService {
     }
 
     @Override
-    public CustomResponse createLivestock(JsonNode livestockEntity) {
+    public CustomResponse createLivestock(JsonNode livestockEntity, String token) {
         log.info("LivestockServiceImpl::createLivestock:entered the method: " + livestockEntity);
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LivestockServiceImpl::createLivestock:token validated, user context: {}", userContext);
 
         CustomResponse response = new CustomResponse();
 
@@ -135,6 +143,8 @@ public class LivestockServiceImpl implements LivestockService {
 
             String initialStatus = lifecyclePolicy.initialStatus(AUDIT_ENTITY_NAME);
 
+            
+            String initialStatus = lifecyclePolicy.initialStatus(CATALOGUE_NAME);
             livestockEntity1.setCreatedOn(currentTime);
             livestockEntity1.setUpdatedOn(currentTime);
             livestockEntity1.setStatus(initialStatus);
@@ -214,6 +224,14 @@ public class LivestockServiceImpl implements LivestockService {
                     livestockEntity1.getUpdatedOn()
             );
 
+            log.info("LivestockServiceImpl::createLivestock::persisted livestock in OAS");
+            auditLogService.logAudit(primaryID, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "create", initialStatus,
+                    objectMapper.createObjectNode(), livestockEntity,
+                    livestockEntity1.getCreatedOn(), livestockEntity1.getUpdatedOn());
             return response;
 
         } catch (Exception e) {
@@ -226,8 +244,13 @@ public class LivestockServiceImpl implements LivestockService {
     }
 
     @Override
-    public CustomResponse searchLivestock(SearchCriteria searchCriteria) {
+    public CustomResponse searchLivestock(SearchCriteria searchCriteria, String token) {
         log.info("LivestockServiceImpl::searchLivestock");
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token, false);
+        log.debug("LivestockServiceImpl::searchLivestock:token validated, user context: {}", userContext);
+
         CustomResponse response = new CustomResponse();
         SearchResult searchResult = redisTemplate.opsForValue()
                 .get(generateRedisJwtTokenKey(searchCriteria));
@@ -235,7 +258,11 @@ public class LivestockServiceImpl implements LivestockService {
             log.info("LivestockServiceImpl::searchLivestock: livestock search result fetched from redis");
             response.getResult().put(Constants.RESULT, searchResult);
             createSuccessResponse(response);
-            auditLogService.logAudit(null, AUDIT_ENTITY_NAME, "search", null, null,
+            auditLogService.logAudit(null, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "search", null, null,
                     objectMapper.valueToTree(searchResult), null, null);
             return response;
         }
@@ -251,7 +278,11 @@ public class LivestockServiceImpl implements LivestockService {
                     esUtilService.searchDocuments(Constants.LIVESTOCK_INDEX_NAME, searchCriteria);
             response.getResult().put(Constants.RESULT, searchResult);
             createSuccessResponse(response);
-            auditLogService.logAudit(null, AUDIT_ENTITY_NAME, "search", null, null,
+            auditLogService.logAudit(null, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "search", null, null,
                     objectMapper.valueToTree(searchResult), null, null);
             return response;
         } catch (Exception e) {
@@ -270,8 +301,13 @@ public class LivestockServiceImpl implements LivestockService {
     }
 
     @Override
-    public CustomResponse read(String id) {
+    public CustomResponse read(String id, String token) {
         log.info("LivestockServiceImpl::read:inside the method");
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token, false);
+        log.debug("LivestockServiceImpl::read:token validated, user context: {}", userContext);
+
         CustomResponse response = new CustomResponse();
         if (StringUtils.isEmpty(id)) {
             response.setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -320,7 +356,11 @@ public class LivestockServiceImpl implements LivestockService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
         if (auditAfter != null) {
-            auditLogService.logAudit(id, AUDIT_ENTITY_NAME, "read", null, null, auditAfter,
+            auditLogService.logAudit(id, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "read", null, null, auditAfter,
                     auditCreatedOn, auditUpdatedOn);
         }
         return response;
@@ -517,7 +557,13 @@ public class LivestockServiceImpl implements LivestockService {
     }
     @Override
     public CustomResponse delete(String id) {
+    public CustomResponse delete(String id, String token) {
         log.info("LivestockServiceImpl::delete:inside the method with id: {}", id);
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LivestockServiceImpl::delete:token validated, user context: {}", userContext);
+
         CustomResponse response = new CustomResponse();
 
         // Validate that the ID is not null or empty
@@ -564,7 +610,11 @@ public class LivestockServiceImpl implements LivestockService {
 
             response.setMessage(Constants.SUCCESSFULLY_DELETED);
             response.setResponseCode(HttpStatus.OK);
-            auditLogService.logAudit(id, AUDIT_ENTITY_NAME, "delete", Constants.DELETED,
+            auditLogService.logAudit(id, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "delete", Constants.DELETED,
                     livestockEntity.getData(), livestockEntity.getData(),
                     livestockEntity.getCreatedOn(), livestockEntity.getUpdatedOn());
             return response;
@@ -577,12 +627,12 @@ public class LivestockServiceImpl implements LivestockService {
     }
 
     @Override
-    public CustomResponse importData(MultipartFile file) {
+    public CustomResponse importData(MultipartFile file, String token) {
         log.info("LivestockServiceImpl::importData::started");
         return importService.processBulkImport(
                 file,
                 Constants.LIVESTOCK_VALIDATION_FILE_JSON,
-                this::createLivestock
+                payload -> createLivestock(payload, token)   // every row is created as the calling user
         );
     }
 
@@ -601,10 +651,15 @@ public class LivestockServiceImpl implements LivestockService {
     }
 
     @Override
-    public CustomResponse draftLivestock(JsonNode livestockEntity) {
+    public CustomResponse draftLivestock(JsonNode livestockEntity, String token) {
         log.info("LivestockServiceImpl::draftLivestock:entered the method: " + livestockEntity);
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LivestockServiceImpl::draftLivestock:token validated, user context: {}", userContext);
+
         // Guard before the try block: the 404 must not be swallowed by the catch below
-        lifecyclePolicy.requireEnabled(AUDIT_ENTITY_NAME);
+        lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
         CustomResponse response = new CustomResponse();
         // Relaxed validation: types/structure enforced, but required fields may be missing
         payloadValidation.validatePayloadRelaxed(Constants.LIVESTOCK_VALIDATION_FILE_JSON, livestockEntity);
@@ -631,7 +686,11 @@ public class LivestockServiceImpl implements LivestockService {
             response.setResult(map);
             response.setMessage(Constants.SUCCESSFULLY_CREATED);
             response.setResponseCode(HttpStatus.OK);
-            auditLogService.logAudit(primaryID, AUDIT_ENTITY_NAME, "draft", Constants.DRAFT,
+            auditLogService.logAudit(primaryID, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "draft", Constants.DRAFT,
                     objectMapper.createObjectNode(), livestockEntity,
                     livestockEntity1.getCreatedOn(), livestockEntity1.getUpdatedOn());
             return response;
@@ -643,9 +702,16 @@ public class LivestockServiceImpl implements LivestockService {
 
 
     @Override
-    public CustomResponse addLivestock(String id, JsonNode livestockEntity) {
+    public CustomResponse addLivestock(String id, JsonNode livestockEntity, String token) {
         log.info("LivestockServiceImpl::addLivestock:entered the method with id: {}", id);
         lifecyclePolicy.requireEnabled(AUDIT_ENTITY_NAME);
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LivestockServiceImpl::addLivestock:token validated, user context: {}", userContext);
+
+        // Guard before the try block: the 404 must not be swallowed by the catch below
+        lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
         CustomResponse response = new CustomResponse();
         if (StringUtils.isEmpty(id)) {
             response.setResponseCode(HttpStatus.BAD_REQUEST);
@@ -706,7 +772,11 @@ public class LivestockServiceImpl implements LivestockService {
             response.setResult(map);
             response.setMessage(Constants.SUCCESSFULLY_UPDATED);
             response.setResponseCode(HttpStatus.OK);
-            auditLogService.logAudit(id, AUDIT_ENTITY_NAME, "add-promote", Constants.PENDING,
+            auditLogService.logAudit(id, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "add-promote", Constants.PENDING,
                     auditBefore, livestockEntity,
                     livestockEntity1.getCreatedOn(), livestockEntity1.getUpdatedOn());
             return response;
@@ -717,22 +787,39 @@ public class LivestockServiceImpl implements LivestockService {
     }
 
     @Override
-    public CustomResponse approveLivestock(LifecycleRequest request) {
+    public CustomResponse approveLivestock(LifecycleRequest request, String token) {
         log.info("LivestockServiceImpl::approveLivestock:entered the method");
-        lifecyclePolicy.requireEnabled(AUDIT_ENTITY_NAME);
-        return transitionStatus(request, "approve", LifecycleUtil.APPROVE_FROM, LifecycleUtil.APPROVE_TARGETS);
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LivestockServiceImpl::approveLivestock:token validated, user context: {}", userContext);
+
+        lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
+        return transitionStatus(request, userContext, "approve",
+                LifecycleUtil.APPROVE_FROM, LifecycleUtil.APPROVE_TARGETS);
     }
 
     @Override
-    public CustomResponse reviewLivestock(LifecycleRequest request) {
+    public CustomResponse reviewLivestock(LifecycleRequest request, String token) {
         log.info("LivestockServiceImpl::reviewLivestock:entered the method");
-        lifecyclePolicy.requireEnabled(AUDIT_ENTITY_NAME);
-        return transitionStatus(request, "review", LifecycleUtil.REVIEW_FROM, LifecycleUtil.REVIEW_TARGETS);
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LivestockServiceImpl::reviewLivestock:token validated, user context: {}", userContext);
+
+        lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
+        return transitionStatus(request, userContext, "review",
+                LifecycleUtil.REVIEW_FROM, LifecycleUtil.REVIEW_TARGETS);
     }
 
     @Override
-    public CustomResponse toggleStatus(String id) {
+    public CustomResponse toggleStatus(String id, String token) {
         log.info("LivestockServiceImpl::toggleStatus:entered the method with id: {}", id);
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LivestockServiceImpl::toggleStatus:token validated, user context: {}", userContext);
+
         CustomResponse response = new CustomResponse();
         if (StringUtils.isEmpty(id)) {
             response.setResponseCode(HttpStatus.BAD_REQUEST);
@@ -777,7 +864,11 @@ public class LivestockServiceImpl implements LivestockService {
             response.setResult(map);
             response.setMessage(Constants.SUCCESSFULLY_UPDATED);
             response.setResponseCode(HttpStatus.OK);
-            auditLogService.logAudit(id, AUDIT_ENTITY_NAME, "toggle", newStatus,
+            auditLogService.logAudit(id, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "toggle", newStatus,
                     livestockEntity1.getData(), livestockEntity1.getData(),
                     livestockEntity1.getCreatedOn(), livestockEntity1.getUpdatedOn());
             return response;
@@ -850,6 +941,7 @@ public class LivestockServiceImpl implements LivestockService {
         }
     }*/
     private CustomResponse transitionStatus(LifecycleRequest request, String operation,
+    private CustomResponse transitionStatus(LifecycleRequest request, JsonNode userContext, String operation,
                                             String requiredCurrentStatus, Set<String> allowedTargets) {
         CustomResponse response = new CustomResponse();
         if (request == null || StringUtils.isEmpty(request.getId())) {
@@ -912,7 +1004,11 @@ public class LivestockServiceImpl implements LivestockService {
             response.setResult(map);
             response.setMessage(Constants.SUCCESSFULLY_UPDATED);
             response.setResponseCode(HttpStatus.OK);
-            auditLogService.logAudit(id, AUDIT_ENTITY_NAME, operation, targetStatus,
+            auditLogService.logAudit(id, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    operation, targetStatus,
                     livestockEntity1.getData(), livestockEntity1.getData(),
                     livestockEntity1.getCreatedOn(), livestockEntity1.getUpdatedOn());
             return response;

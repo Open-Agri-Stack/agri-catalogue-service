@@ -1,0 +1,20 @@
+{
+    "locationconfigId": {
+        "type": "keyword"
+    },
+    "locationLabel": {
+        "type": "keyword"
+    },
+    "locationOrder": {
+        "type": "keyword"
+    },
+    "status": {
+        "type": "keyword"
+    },
+    "createdOn": {
+        "type": "date"
+    },
+    "updatedOn": {
+        "type": "date"
+    }
+}

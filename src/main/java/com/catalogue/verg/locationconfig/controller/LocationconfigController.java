@@ -1,11 +1,11 @@
-package com.catalogue.verg.{{service_name_lower}}.controller;
+package com.catalogue.verg.locationconfig.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.catalogue.verg.core.config.LifecyclePolicy;
 import com.catalogue.verg.core.dto.CustomResponse;
 import com.catalogue.verg.core.dto.LifecycleRequest;
 import com.catalogue.verg.core.elasticsearch.dto.SearchCriteria;
-import com.catalogue.verg.{{service_name_lower}}.service.{{service_name_pascal}}Service;
+import com.catalogue.verg.locationconfig.service.LocationconfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,20 +13,20 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/{{service_name_lower}}")
-public class {{service_name_pascal}}Controller {
+@RequestMapping("/locationconfig")
+public class LocationconfigController {
     @Autowired
-    private {{service_name_pascal}}Service {{service_name_camel}}Service;
+    private LocationconfigService locationconfigService;
 
     @Autowired
     private LifecyclePolicy lifecyclePolicy;
 
     /** Key this catalogue is looked up by in the lifecycle switches. */
-    private static final String CATALOGUE_NAME = "{{service_name_lower}}";
+    private static final String CATALOGUE_NAME = "locationconfig";
 
     //@PostMapping("/v1/create")
-    public ResponseEntity<CustomResponse> create(@RequestBody JsonNode {{service_name_camel}}Details) {
-        CustomResponse response = {{service_name_camel}}Service.create{{service_name_pascal}}({{service_name_camel}}Details, null);
+    public ResponseEntity<CustomResponse> create(@RequestBody JsonNode locationconfigDetails) {
+        CustomResponse response = locationconfigService.createLocationconfig(locationconfigDetails, null);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -34,9 +34,9 @@ public class {{service_name_pascal}}Controller {
     @PostMapping("/v1/draft")
     public ResponseEntity<CustomResponse> draft(
             @RequestHeader(value = "Authorization", required = false) String token,
-            @RequestBody JsonNode {{service_name_camel}}Details) {
+            @RequestBody JsonNode locationconfigDetails) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = {{service_name_camel}}Service.draft{{service_name_pascal}}({{service_name_camel}}Details, token);
+        CustomResponse response = locationconfigService.draftLocationconfig(locationconfigDetails, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -45,8 +45,8 @@ public class {{service_name_pascal}}Controller {
     @PostMapping("/v1/add")
     public ResponseEntity<CustomResponse> add(
             @RequestHeader(value = "Authorization", required = false) String token,
-            @RequestBody JsonNode {{service_name_camel}}Details) {
-        CustomResponse response = {{service_name_camel}}Service.create{{service_name_pascal}}({{service_name_camel}}Details, token);
+            @RequestBody JsonNode locationconfigDetails) {
+        CustomResponse response = locationconfigService.createLocationconfig(locationconfigDetails, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -54,9 +54,9 @@ public class {{service_name_pascal}}Controller {
     @PutMapping("/v1/add/{id}")
     public ResponseEntity<CustomResponse> addById(
             @RequestHeader(value = "Authorization", required = false) String token,
-            @PathVariable String id, @RequestBody JsonNode {{service_name_camel}}Details) {
+            @PathVariable String id, @RequestBody JsonNode locationconfigDetails) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = {{service_name_camel}}Service.add{{service_name_pascal}}(id, {{service_name_camel}}Details, token);
+        CustomResponse response = locationconfigService.addLocationconfig(id, locationconfigDetails, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -66,7 +66,7 @@ public class {{service_name_pascal}}Controller {
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestBody LifecycleRequest request) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = {{service_name_camel}}Service.approve{{service_name_pascal}}(request, token);
+        CustomResponse response = locationconfigService.approveLocationconfig(request, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -76,7 +76,7 @@ public class {{service_name_pascal}}Controller {
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestBody LifecycleRequest request) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = {{service_name_camel}}Service.review{{service_name_pascal}}(request, token);
+        CustomResponse response = locationconfigService.reviewLocationconfig(request, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -87,7 +87,7 @@ public class {{service_name_pascal}}Controller {
     public ResponseEntity<CustomResponse> toggle(
             @RequestHeader(value = "Authorization", required = false) String token,
             @PathVariable String id) {
-        CustomResponse response = {{service_name_camel}}Service.toggleStatus(id, token);
+        CustomResponse response = locationconfigService.toggleStatus(id, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -95,7 +95,7 @@ public class {{service_name_pascal}}Controller {
     public ResponseEntity<?> search(
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestBody SearchCriteria searchCriteria) {
-        CustomResponse response = {{service_name_camel}}Service.search{{service_name_pascal}}(searchCriteria, token);
+        CustomResponse response = locationconfigService.searchLocationconfig(searchCriteria, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -103,13 +103,13 @@ public class {{service_name_pascal}}Controller {
     public ResponseEntity<?> read(
             @RequestHeader(value = "Authorization", required = false) String token,
             @PathVariable String id) {
-        CustomResponse response = {{service_name_camel}}Service.read(id, token);
+        CustomResponse response = locationconfigService.read(id, token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/v1/update/{id}")
-    public ResponseEntity<CustomResponse> update(@PathVariable String id, @RequestBody JsonNode {{service_name_camel}}Details) {
-        CustomResponse response = {{service_name_camel}}Service.update{{service_name_pascal}}(id, {{service_name_camel}}Details);
+    public ResponseEntity<CustomResponse> update(@PathVariable String id, @RequestBody JsonNode locationconfigDetails) {
+        CustomResponse response = locationconfigService.updateLocationconfig(id, locationconfigDetails);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -117,7 +117,7 @@ public class {{service_name_pascal}}Controller {
     public ResponseEntity<?> delete(
             @RequestHeader(value = "Authorization", required = false) String token,
             @PathVariable String id) {
-        CustomResponse response = {{service_name_camel}}Service.delete(id, token);
+        CustomResponse response = locationconfigService.delete(id, token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -125,14 +125,14 @@ public class {{service_name_pascal}}Controller {
     public ResponseEntity<CustomResponse> importData(
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestParam("file") MultipartFile file) {
-        CustomResponse response = {{service_name_camel}}Service.importData(file, token);
+        CustomResponse response = locationconfigService.importData(file, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Drops the ES index and rebuilds it from the primary store (Postgres); skips DELETED records
     @PostMapping("/v1/loadFromPrimary")
     public ResponseEntity<CustomResponse> loadFromPrimary() {
-        CustomResponse response = {{service_name_camel}}Service.loadFromPrimary{{service_name_pascal}}();
+        CustomResponse response = locationconfigService.loadFromPrimaryLocationconfig();
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 }

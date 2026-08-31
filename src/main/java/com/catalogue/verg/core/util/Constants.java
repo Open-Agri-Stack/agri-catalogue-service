@@ -117,6 +117,24 @@ public class Constants{
     public static final String LIVESTOCK_INDEX_NAME = "livestock_index";
 
     
+    // Livestockbreed Specific Constants
+    public static final String LIVESTOCKBREED_VALIDATION_FILE_JSON = "/payloadValidation/livestockbreedPayloadValidation.json";
+    public static final String LIVESTOCKBREED_ID_RQST = "livestockbreedId";
+    public static final String LIVESTOCKBREED_INDEX_NAME = "livestockbreed_index";
+
+    
+    // Livestockcategory Specific Constants
+    public static final String LIVESTOCKCATEGORY_VALIDATION_FILE_JSON = "/payloadValidation/livestockcategoryPayloadValidation.json";
+    public static final String LIVESTOCKCATEGORY_ID_RQST = "livestockcategoryId";
+    public static final String LIVESTOCKCATEGORY_INDEX_NAME = "livestockcategory_index";
+
+    
+    // Season Specific Constants
+    public static final String SEASON_VALIDATION_FILE_JSON = "/payloadValidation/seasonPayloadValidation.json";
+    public static final String SEASON_ID_RQST = "seasonId";
+    public static final String SEASON_INDEX_NAME = "season_index";
+
+    
     // Soil Specific Constants
     public static final String SOIL_VALIDATION_FILE_JSON = "/payloadValidation/soilPayloadValidation.json";
     public static final String SOIL_ID_RQST = "soilId";
@@ -159,28 +177,16 @@ public class Constants{
     public static final String LOCATIONMAPPER_INDEX_NAME = "locationmapper_index";
 
     
+    // Locationconfig Specific Constants
+    public static final String LOCATIONCONFIG_VALIDATION_FILE_JSON = "/payloadValidation/locationconfigPayloadValidation.json";
+    public static final String LOCATIONCONFIG_ID_RQST = "locationconfigId";
+    public static final String LOCATIONCONFIG_INDEX_NAME = "locationconfig_index";
+
+    
     // Marketplace Specific Constants
     public static final String MARKETPLACE_VALIDATION_FILE_JSON = "/payloadValidation/marketplacePayloadValidation.json";
     public static final String MARKETPLACE_ID_RQST = "marketplaceId";
     public static final String MARKETPLACE_INDEX_NAME = "marketplace_index";
-
-    
-    // Season Specific Constants
-    public static final String SEASON_VALIDATION_FILE_JSON = "/payloadValidation/seasonPayloadValidation.json";
-    public static final String SEASON_ID_RQST = "seasonId";
-    public static final String SEASON_INDEX_NAME = "season_index";
-
-    
-    // Livestockbreed Specific Constants
-    public static final String LIVESTOCKBREED_VALIDATION_FILE_JSON = "/payloadValidation/livestockbreedPayloadValidation.json";
-    public static final String LIVESTOCKBREED_ID_RQST = "livestockbreedId";
-    public static final String LIVESTOCKBREED_INDEX_NAME = "livestockbreed_index";
-
-    
-    // Livestockcategory Specific Constants
-    public static final String LIVESTOCKCATEGORY_VALIDATION_FILE_JSON = "/payloadValidation/livestockcategoryPayloadValidation.json";
-    public static final String LIVESTOCKCATEGORY_ID_RQST = "livestockcategoryId";
-    public static final String LIVESTOCKCATEGORY_INDEX_NAME = "livestockcategory_index";
 
         private Constants() {
     }

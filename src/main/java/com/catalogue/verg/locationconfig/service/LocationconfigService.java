@@ -1,4 +1,4 @@
-package com.catalogue.verg.livestock.service;
+package com.catalogue.verg.locationconfig.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.catalogue.verg.core.dto.CustomResponse;
@@ -7,31 +7,31 @@ import com.catalogue.verg.core.elasticsearch.dto.SearchCriteria;
 import org.springframework.web.multipart.MultipartFile;
 
 
-public interface LivestockService {
+public interface LocationconfigService {
 
     // token: the raw Authorization header from the caller
-    CustomResponse createLivestock(JsonNode livestockEntity, String token);
+    CustomResponse createLocationconfig(JsonNode locationconfigEntity, String token);
 
-    CustomResponse updateLivestock(String id, JsonNode livestockEntity);
+    CustomResponse updateLocationconfig(String id, JsonNode locationconfigEntity);
 
     // Lifecycle: create an incomplete DRAFT (relaxed validation)
-    CustomResponse draftLivestock(JsonNode livestockEntity, String token);
+    CustomResponse draftLocationconfig(JsonNode locationconfigEntity, String token);
 
     // Lifecycle: (re-)submit a DRAFT/REWORK record for approval -> PENDING (full validation)
-    CustomResponse addLivestock(String id, JsonNode livestockEntity, String token);
+    CustomResponse addLocationconfig(String id, JsonNode locationconfigEntity, String token);
 
     // Lifecycle: PENDING -> APPROVED | REJECTED | REWORK
-    CustomResponse approveLivestock(LifecycleRequest request, String token);
+    CustomResponse approveLocationconfig(LifecycleRequest request, String token);
 
     // Lifecycle: APPROVED -> ACTIVE(published) | REJECTED | REWORK | PENDING
-    CustomResponse reviewLivestock(LifecycleRequest request, String token);
+    CustomResponse reviewLocationconfig(LifecycleRequest request, String token);
 
     // Toggle a live record between ACTIVE and INACTIVE (rejects any other status)
     CustomResponse toggleStatus(String id, String token);
 
-    CustomResponse searchLivestock(SearchCriteria searchCriteria, String token);
+    CustomResponse searchLocationconfig(SearchCriteria searchCriteria, String token);
 
-    CustomResponse assignLivestock(JsonNode livestockEntity, String token);
+    CustomResponse assignLocationconfig(JsonNode locationconfigEntity, String token);
 
     CustomResponse read(String id, String token);
 
@@ -40,5 +40,5 @@ public interface LivestockService {
     CustomResponse importData(MultipartFile file, String token);
 
     // Drops the ES index and rebuilds it from the primary store (Postgres); skips DELETED records
-    CustomResponse loadFromPrimaryLivestock();
+    CustomResponse loadFromPrimaryLocationconfig();
 }

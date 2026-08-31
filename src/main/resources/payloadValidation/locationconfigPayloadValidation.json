@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "locationconfigId": {
+            "type": "string",
+            "prefix": "locationconfig-",
+            "key": "Primary",
+            "keyLength": 12,
+            "description": "description about locationconfigId"
+        },
+        "locationLabel": {
+            "type": "string",
+            "description": "The label to use for locations of this type."
+        },
+        "locationOrder": {
+            "type": "string",
+            "description": "The relative sort order of this location level."
+        }
+        
+    },
+    "required": [
+        "locationLabel",
+        "locationOrder"
+    ]
+}

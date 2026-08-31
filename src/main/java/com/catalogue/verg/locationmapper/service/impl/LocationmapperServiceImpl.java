@@ -22,6 +22,7 @@ import com.catalogue.verg.core.util.LifecycleUtil;
 import com.catalogue.verg.core.util.PayloadValidation;
 import com.catalogue.verg.core.util.VergProperties;
 import com.catalogue.verg.core.service.AuditLogService;
+import com.catalogue.verg.core.service.AuthValidationService;
 import com.catalogue.verg.core.service.ImportService;
 import com.catalogue.verg.core.service.LoadFromPrimaryService;
 import com.catalogue.verg.core.util.PrimaryKeyUtil;
@@ -87,11 +88,14 @@ public class LocationmapperServiceImpl implements LocationmapperService {
     @Autowired
     private LifecyclePolicy lifecyclePolicy;
 
+    @Autowired
+    private AuthValidationService authValidationService;
+
     /**
      * Catalogue name recorded on every audit row emitted by this service. Doubles as the key
      * this catalogue is looked up by in the lifecycle switches ({@link LifecyclePolicy}).
      */
-    private static final String AUDIT_ENTITY_NAME = "locationmapper";
+    private static final String CATALOGUE_NAME = "locationmapper";
 
     private Logger logger = LoggerFactory.getLogger(LocationmapperServiceImpl.class);
 
@@ -99,8 +103,13 @@ public class LocationmapperServiceImpl implements LocationmapperService {
     private long searchResultRedisTtl;
 
     @Override
-    public CustomResponse createLocationmapper(JsonNode locationmapperEntity) {
+    public CustomResponse createLocationmapper(JsonNode locationmapperEntity, String token) {
         log.info("LocationmapperServiceImpl::createLocationmapper:entered the method: " + locationmapperEntity);
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LocationmapperServiceImpl::createLocationmapper:token validated, user context: {}", userContext);
+
         CustomResponse response = new CustomResponse();
         payloadValidation.validatePayload(Constants.LOCATIONMAPPER_VALIDATION_FILE_JSON, locationmapperEntity);
 
@@ -114,7 +123,7 @@ public class LocationmapperServiceImpl implements LocationmapperService {
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
-            String initialStatus = lifecyclePolicy.initialStatus(AUDIT_ENTITY_NAME);
+            String initialStatus = lifecyclePolicy.initialStatus(CATALOGUE_NAME);
             locationmapperEntity1.setCreatedOn(currentTime);
             locationmapperEntity1.setUpdatedOn(currentTime);
             locationmapperEntity1.setStatus(initialStatus);
@@ -133,7 +142,11 @@ public class LocationmapperServiceImpl implements LocationmapperService {
             response.setResult(map);
             response.setResponseCode(HttpStatus.OK);
             log.info("LocationmapperServiceImpl::createLocationmapper::persisted locationmapper in OAS");
-            auditLogService.logAudit(primaryID, AUDIT_ENTITY_NAME, "create", initialStatus,
+            auditLogService.logAudit(primaryID, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "create", initialStatus,
                     objectMapper.createObjectNode(), locationmapperEntity,
                     locationmapperEntity1.getCreatedOn(), locationmapperEntity1.getUpdatedOn());
             return response;
@@ -145,8 +158,13 @@ public class LocationmapperServiceImpl implements LocationmapperService {
     }
 
     @Override
-    public CustomResponse searchLocationmapper(SearchCriteria searchCriteria) {
+    public CustomResponse searchLocationmapper(SearchCriteria searchCriteria, String token) {
         log.info("LocationmapperServiceImpl::searchLocationmapper");
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token, false);
+        log.debug("LocationmapperServiceImpl::searchLocationmapper:token validated, user context: {}", userContext);
+
         CustomResponse response = new CustomResponse();
         SearchResult searchResult = redisTemplate.opsForValue()
                 .get(generateRedisJwtTokenKey(searchCriteria));
@@ -154,7 +172,11 @@ public class LocationmapperServiceImpl implements LocationmapperService {
             log.info("LocationmapperServiceImpl::searchLocationmapper: locationmapper search result fetched from redis");
             response.getResult().put(Constants.RESULT, searchResult);
             createSuccessResponse(response);
-            auditLogService.logAudit(null, AUDIT_ENTITY_NAME, "search", null, null,
+            auditLogService.logAudit(null, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "search", null, null,
                     objectMapper.valueToTree(searchResult), null, null);
             return response;
         }
@@ -170,7 +192,11 @@ public class LocationmapperServiceImpl implements LocationmapperService {
                     esUtilService.searchDocuments(Constants.LOCATIONMAPPER_INDEX_NAME, searchCriteria);
             response.getResult().put(Constants.RESULT, searchResult);
             createSuccessResponse(response);
-            auditLogService.logAudit(null, AUDIT_ENTITY_NAME, "search", null, null,
+            auditLogService.logAudit(null, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "search", null, null,
                     objectMapper.valueToTree(searchResult), null, null);
             return response;
         } catch (Exception e) {
@@ -189,8 +215,13 @@ public class LocationmapperServiceImpl implements LocationmapperService {
     }
 
     @Override
-    public CustomResponse read(String id) {
+    public CustomResponse read(String id, String token) {
         log.info("LocationmapperServiceImpl::read:inside the method");
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token, false);
+        log.debug("LocationmapperServiceImpl::read:token validated, user context: {}", userContext);
+
         CustomResponse response = new CustomResponse();
         if (StringUtils.isEmpty(id)) {
             response.setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -239,7 +270,11 @@ public class LocationmapperServiceImpl implements LocationmapperService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
         if (auditAfter != null) {
-            auditLogService.logAudit(id, AUDIT_ENTITY_NAME, "read", null, null, auditAfter,
+            auditLogService.logAudit(id, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "read", null, null, auditAfter,
                     auditCreatedOn, auditUpdatedOn);
         }
         return response;
@@ -315,8 +350,13 @@ public class LocationmapperServiceImpl implements LocationmapperService {
     }
 
     @Override
-    public CustomResponse delete(String id) {
+    public CustomResponse delete(String id, String token) {
         log.info("LocationmapperServiceImpl::delete:inside the method with id: {}", id);
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LocationmapperServiceImpl::delete:token validated, user context: {}", userContext);
+
         CustomResponse response = new CustomResponse();
 
         // Validate that the ID is not null or empty
@@ -363,7 +403,11 @@ public class LocationmapperServiceImpl implements LocationmapperService {
 
             response.setMessage(Constants.SUCCESSFULLY_DELETED);
             response.setResponseCode(HttpStatus.OK);
-            auditLogService.logAudit(id, AUDIT_ENTITY_NAME, "delete", Constants.DELETED,
+            auditLogService.logAudit(id, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "delete", Constants.DELETED,
                     locationmapperEntity.getData(), locationmapperEntity.getData(),
                     locationmapperEntity.getCreatedOn(), locationmapperEntity.getUpdatedOn());
             return response;
@@ -376,12 +420,12 @@ public class LocationmapperServiceImpl implements LocationmapperService {
     }
 
     @Override
-    public CustomResponse importData(MultipartFile file) {
+    public CustomResponse importData(MultipartFile file, String token) {
         log.info("LocationmapperServiceImpl::importData::started");
         return importService.processBulkImport(
                 file,
                 Constants.LOCATIONMAPPER_VALIDATION_FILE_JSON,
-                this::createLocationmapper
+                payload -> createLocationmapper(payload, token)   // every row is created as the calling user
         );
     }
 
@@ -400,10 +444,15 @@ public class LocationmapperServiceImpl implements LocationmapperService {
     }
 
     @Override
-    public CustomResponse draftLocationmapper(JsonNode locationmapperEntity) {
+    public CustomResponse draftLocationmapper(JsonNode locationmapperEntity, String token) {
         log.info("LocationmapperServiceImpl::draftLocationmapper:entered the method: " + locationmapperEntity);
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LocationmapperServiceImpl::draftLocationmapper:token validated, user context: {}", userContext);
+
         // Guard before the try block: the 404 must not be swallowed by the catch below
-        lifecyclePolicy.requireEnabled(AUDIT_ENTITY_NAME);
+        lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
         CustomResponse response = new CustomResponse();
         // Relaxed validation: types/structure enforced, but required fields may be missing
         payloadValidation.validatePayloadRelaxed(Constants.LOCATIONMAPPER_VALIDATION_FILE_JSON, locationmapperEntity);
@@ -430,7 +479,11 @@ public class LocationmapperServiceImpl implements LocationmapperService {
             response.setResult(map);
             response.setMessage(Constants.SUCCESSFULLY_CREATED);
             response.setResponseCode(HttpStatus.OK);
-            auditLogService.logAudit(primaryID, AUDIT_ENTITY_NAME, "draft", Constants.DRAFT,
+            auditLogService.logAudit(primaryID, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "draft", Constants.DRAFT,
                     objectMapper.createObjectNode(), locationmapperEntity,
                     locationmapperEntity1.getCreatedOn(), locationmapperEntity1.getUpdatedOn());
             return response;
@@ -441,10 +494,15 @@ public class LocationmapperServiceImpl implements LocationmapperService {
     }
 
     @Override
-    public CustomResponse addLocationmapper(String id, JsonNode locationmapperEntity) {
+    public CustomResponse addLocationmapper(String id, JsonNode locationmapperEntity, String token) {
         log.info("LocationmapperServiceImpl::addLocationmapper:entered the method with id: {}", id);
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LocationmapperServiceImpl::addLocationmapper:token validated, user context: {}", userContext);
+
         // Guard before the try block: the 404 must not be swallowed by the catch below
-        lifecyclePolicy.requireEnabled(AUDIT_ENTITY_NAME);
+        lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
         CustomResponse response = new CustomResponse();
         if (StringUtils.isEmpty(id)) {
             response.setResponseCode(HttpStatus.BAD_REQUEST);
@@ -488,7 +546,11 @@ public class LocationmapperServiceImpl implements LocationmapperService {
             response.setResult(map);
             response.setMessage(Constants.SUCCESSFULLY_UPDATED);
             response.setResponseCode(HttpStatus.OK);
-            auditLogService.logAudit(id, AUDIT_ENTITY_NAME, "add-promote", Constants.PENDING,
+            auditLogService.logAudit(id, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "add-promote", Constants.PENDING,
                     auditBefore, locationmapperEntity,
                     locationmapperEntity1.getCreatedOn(), locationmapperEntity1.getUpdatedOn());
             return response;
@@ -499,22 +561,39 @@ public class LocationmapperServiceImpl implements LocationmapperService {
     }
 
     @Override
-    public CustomResponse approveLocationmapper(LifecycleRequest request) {
+    public CustomResponse approveLocationmapper(LifecycleRequest request, String token) {
         log.info("LocationmapperServiceImpl::approveLocationmapper:entered the method");
-        lifecyclePolicy.requireEnabled(AUDIT_ENTITY_NAME);
-        return transitionStatus(request, "approve", LifecycleUtil.APPROVE_FROM, LifecycleUtil.APPROVE_TARGETS);
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LocationmapperServiceImpl::approveLocationmapper:token validated, user context: {}", userContext);
+
+        lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
+        return transitionStatus(request, userContext, "approve",
+                LifecycleUtil.APPROVE_FROM, LifecycleUtil.APPROVE_TARGETS);
     }
 
     @Override
-    public CustomResponse reviewLocationmapper(LifecycleRequest request) {
+    public CustomResponse reviewLocationmapper(LifecycleRequest request, String token) {
         log.info("LocationmapperServiceImpl::reviewLocationmapper:entered the method");
-        lifecyclePolicy.requireEnabled(AUDIT_ENTITY_NAME);
-        return transitionStatus(request, "review", LifecycleUtil.REVIEW_FROM, LifecycleUtil.REVIEW_TARGETS);
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LocationmapperServiceImpl::reviewLocationmapper:token validated, user context: {}", userContext);
+
+        lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
+        return transitionStatus(request, userContext, "review",
+                LifecycleUtil.REVIEW_FROM, LifecycleUtil.REVIEW_TARGETS);
     }
 
     @Override
-    public CustomResponse toggleStatus(String id) {
+    public CustomResponse toggleStatus(String id, String token) {
         log.info("LocationmapperServiceImpl::toggleStatus:entered the method with id: {}", id);
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LocationmapperServiceImpl::toggleStatus:token validated, user context: {}", userContext);
+
         CustomResponse response = new CustomResponse();
         if (StringUtils.isEmpty(id)) {
             response.setResponseCode(HttpStatus.BAD_REQUEST);
@@ -559,7 +638,11 @@ public class LocationmapperServiceImpl implements LocationmapperService {
             response.setResult(map);
             response.setMessage(Constants.SUCCESSFULLY_UPDATED);
             response.setResponseCode(HttpStatus.OK);
-            auditLogService.logAudit(id, AUDIT_ENTITY_NAME, "toggle", newStatus,
+            auditLogService.logAudit(id, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    "toggle", newStatus,
                     locationmapperEntity1.getData(), locationmapperEntity1.getData(),
                     locationmapperEntity1.getCreatedOn(), locationmapperEntity1.getUpdatedOn());
             return response;
@@ -573,7 +656,7 @@ public class LocationmapperServiceImpl implements LocationmapperService {
      * Shared status-transition logic for approve/review. Validates the id and requested target status,
      * enforces the required current status, then persists the new status to Postgres, ES and Redis.
      */
-    private CustomResponse transitionStatus(LifecycleRequest request, String operation,
+    private CustomResponse transitionStatus(LifecycleRequest request, JsonNode userContext, String operation,
                                             String requiredCurrentStatus, Set<String> allowedTargets) {
         CustomResponse response = new CustomResponse();
         if (request == null || StringUtils.isEmpty(request.getId())) {
@@ -622,7 +705,11 @@ public class LocationmapperServiceImpl implements LocationmapperService {
             response.setResult(map);
             response.setMessage(Constants.SUCCESSFULLY_UPDATED);
             response.setResponseCode(HttpStatus.OK);
-            auditLogService.logAudit(id, AUDIT_ENTITY_NAME, operation, targetStatus,
+            auditLogService.logAudit(id, CATALOGUE_NAME,
+                    userContext.path("userId").asText(null),
+                    userContext.path("userName").asText(null),
+                    userContext.path("functionalRole").asText(null),
+                    operation, targetStatus,
                     locationmapperEntity1.getData(), locationmapperEntity1.getData(),
                     locationmapperEntity1.getCreatedOn(), locationmapperEntity1.getUpdatedOn());
             return response;

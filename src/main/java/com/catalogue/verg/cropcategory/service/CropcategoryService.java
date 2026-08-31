@@ -9,34 +9,35 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface CropcategoryService {
 
-    CustomResponse createCropcategory(JsonNode cropcategoryEntity);
+    // token: the raw Authorization header from the caller
+    CustomResponse createCropcategory(JsonNode cropcategoryEntity, String token);
 
     CustomResponse updateCropcategory(String id, JsonNode cropcategoryEntity);
 
     // Lifecycle: create an incomplete DRAFT (relaxed validation)
-    CustomResponse draftCropcategory(JsonNode cropcategoryEntity);
+    CustomResponse draftCropcategory(JsonNode cropcategoryEntity, String token);
 
     // Lifecycle: (re-)submit a DRAFT/REWORK record for approval -> PENDING (full validation)
-    CustomResponse addCropcategory(String id, JsonNode cropcategoryEntity);
+    CustomResponse addCropcategory(String id, JsonNode cropcategoryEntity, String token);
 
     // Lifecycle: PENDING -> APPROVED | REJECTED | REWORK
-    CustomResponse approveCropcategory(LifecycleRequest request);
+    CustomResponse approveCropcategory(LifecycleRequest request, String token);
 
     // Lifecycle: APPROVED -> ACTIVE(published) | REJECTED | REWORK | PENDING
-    CustomResponse reviewCropcategory(LifecycleRequest request);
+    CustomResponse reviewCropcategory(LifecycleRequest request, String token);
 
     // Toggle a live record between ACTIVE and INACTIVE (rejects any other status)
-    CustomResponse toggleStatus(String id);
+    CustomResponse toggleStatus(String id, String token);
 
-    CustomResponse searchCropcategory(SearchCriteria searchCriteria);
+    CustomResponse searchCropcategory(SearchCriteria searchCriteria, String token);
 
     CustomResponse assignCropcategory(JsonNode cropcategoryEntity, String token);
 
-    CustomResponse read(String id);
+    CustomResponse read(String id, String token);
 
-    CustomResponse delete(String id);
+    CustomResponse delete(String id, String token);
 
-    CustomResponse importData(MultipartFile file);
+    CustomResponse importData(MultipartFile file, String token);
 
     // Drops the ES index and rebuilds it from the primary store (Postgres); skips DELETED records
     CustomResponse loadFromPrimaryCropcategory();

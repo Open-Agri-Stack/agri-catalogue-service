@@ -9,34 +9,35 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface LivestockbreedService {
 
-    CustomResponse createLivestockbreed(JsonNode livestockbreedEntity);
+    // token: the raw Authorization header from the caller
+    CustomResponse createLivestockbreed(JsonNode livestockbreedEntity, String token);
 
     CustomResponse updateLivestockbreed(String id, JsonNode livestockbreedEntity);
 
     // Lifecycle: create an incomplete DRAFT (relaxed validation)
-    CustomResponse draftLivestockbreed(JsonNode livestockbreedEntity);
+    CustomResponse draftLivestockbreed(JsonNode livestockbreedEntity, String token);
 
     // Lifecycle: (re-)submit a DRAFT/REWORK record for approval -> PENDING (full validation)
-    CustomResponse addLivestockbreed(String id, JsonNode livestockbreedEntity);
+    CustomResponse addLivestockbreed(String id, JsonNode livestockbreedEntity, String token);
 
     // Lifecycle: PENDING -> APPROVED | REJECTED | REWORK
-    CustomResponse approveLivestockbreed(LifecycleRequest request);
+    CustomResponse approveLivestockbreed(LifecycleRequest request, String token);
 
     // Lifecycle: APPROVED -> ACTIVE(published) | REJECTED | REWORK | PENDING
-    CustomResponse reviewLivestockbreed(LifecycleRequest request);
+    CustomResponse reviewLivestockbreed(LifecycleRequest request, String token);
 
     // Toggle a live record between ACTIVE and INACTIVE (rejects any other status)
-    CustomResponse toggleStatus(String id);
+    CustomResponse toggleStatus(String id, String token);
 
-    CustomResponse searchLivestockbreed(SearchCriteria searchCriteria);
+    CustomResponse searchLivestockbreed(SearchCriteria searchCriteria, String token);
 
     CustomResponse assignLivestockbreed(JsonNode livestockbreedEntity, String token);
 
-    CustomResponse read(String id);
+    CustomResponse read(String id, String token);
 
-    CustomResponse delete(String id);
+    CustomResponse delete(String id, String token);
 
-    CustomResponse importData(MultipartFile file);
+    CustomResponse importData(MultipartFile file, String token);
 
     // Drops the ES index and rebuilds it from the primary store (Postgres); skips DELETED records
     CustomResponse loadFromPrimaryLivestockbreed();

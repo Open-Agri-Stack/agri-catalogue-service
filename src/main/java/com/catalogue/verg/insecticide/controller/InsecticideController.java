@@ -26,47 +26,57 @@ public class InsecticideController {
 
     //@PostMapping("/v1/create")
     public ResponseEntity<CustomResponse> create(@RequestBody JsonNode insecticideDetails) {
-        CustomResponse response = insecticideService.createInsecticide(insecticideDetails);
+        CustomResponse response = insecticideService.createInsecticide(insecticideDetails, null);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Lifecycle: create an incomplete DRAFT (relaxed validation)
     @PostMapping("/v1/draft")
-    public ResponseEntity<CustomResponse> draft(@RequestBody JsonNode insecticideDetails) {
+    public ResponseEntity<CustomResponse> draft(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody JsonNode insecticideDetails) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = insecticideService.draftInsecticide(insecticideDetails);
+        CustomResponse response = insecticideService.draftInsecticide(insecticideDetails, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Creates a new record (full validation). With the lifecycle on it lands PENDING and has
     // to be approved then reviewed; with the lifecycle off it lands ACTIVE straight away.
     @PostMapping("/v1/add")
-    public ResponseEntity<CustomResponse> add(@RequestBody JsonNode insecticideDetails) {
-        CustomResponse response = insecticideService.createInsecticide(insecticideDetails);
+    public ResponseEntity<CustomResponse> add(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody JsonNode insecticideDetails) {
+        CustomResponse response = insecticideService.createInsecticide(insecticideDetails, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Lifecycle: (re-)submit an existing DRAFT/REWORK record for approval (PENDING, full validation)
     @PutMapping("/v1/add/{id}")
-    public ResponseEntity<CustomResponse> addById(@PathVariable String id, @RequestBody JsonNode insecticideDetails) {
+    public ResponseEntity<CustomResponse> addById(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @PathVariable String id, @RequestBody JsonNode insecticideDetails) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = insecticideService.addInsecticide(id, insecticideDetails);
+        CustomResponse response = insecticideService.addInsecticide(id, insecticideDetails, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Lifecycle: PENDING -> APPROVED | REJECTED | REWORK
     @PutMapping("/v1/approve")
-    public ResponseEntity<CustomResponse> approve(@RequestBody LifecycleRequest request) {
+    public ResponseEntity<CustomResponse> approve(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody LifecycleRequest request) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = insecticideService.approveInsecticide(request);
+        CustomResponse response = insecticideService.approveInsecticide(request, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Lifecycle: APPROVED -> ACTIVE(published) | REJECTED | REWORK
     @PutMapping("/v1/review")
-    public ResponseEntity<CustomResponse> review(@RequestBody LifecycleRequest request) {
+    public ResponseEntity<CustomResponse> review(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody LifecycleRequest request) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = insecticideService.reviewInsecticide(request);
+        CustomResponse response = insecticideService.reviewInsecticide(request, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -74,20 +84,26 @@ public class InsecticideController {
     // Deliberately NOT gated: plain activate/deactivate, not part of the approval chain, and
     // with the lifecycle off it is the only way to take a record offline short of deleting it.
     @PutMapping("/v1/toggle/{id}")
-    public ResponseEntity<CustomResponse> toggle(@PathVariable String id) {
-        CustomResponse response = insecticideService.toggleStatus(id);
+    public ResponseEntity<CustomResponse> toggle(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @PathVariable String id) {
+        CustomResponse response = insecticideService.toggleStatus(id, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     @PostMapping("/v1/search")
-    public ResponseEntity<?> search(@RequestBody SearchCriteria searchCriteria) {
-        CustomResponse response = insecticideService.searchInsecticide(searchCriteria);
+    public ResponseEntity<?> search(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody SearchCriteria searchCriteria) {
+        CustomResponse response = insecticideService.searchInsecticide(searchCriteria, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     @GetMapping("/v1/read/{id}")
-    public ResponseEntity<?> read(@PathVariable String id) {
-        CustomResponse response = insecticideService.read(id);
+    public ResponseEntity<?> read(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @PathVariable String id) {
+        CustomResponse response = insecticideService.read(id, token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -98,14 +114,18 @@ public class InsecticideController {
     }
 
     @DeleteMapping("/v1/delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
-        CustomResponse response = insecticideService.delete(id);
+    public ResponseEntity<?> delete(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @PathVariable String id) {
+        CustomResponse response = insecticideService.delete(id, token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/v1/import")
-    public ResponseEntity<CustomResponse> importData(@RequestParam("file") MultipartFile file) {
-        CustomResponse response = insecticideService.importData(file);
+    public ResponseEntity<CustomResponse> importData(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestParam("file") MultipartFile file) {
+        CustomResponse response = insecticideService.importData(file, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 

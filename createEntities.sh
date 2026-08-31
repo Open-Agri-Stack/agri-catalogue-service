@@ -7,6 +7,8 @@ entities=(
     "cropVariety"
     "cropCategory"
     "livestock"
+    "livestockBreed"
+    "livestockCategory"
     "season"
     "soil"
     "extensionequipment"
@@ -15,6 +17,7 @@ entities=(
     "fertilizer"
     "locationObject"
     "locationMapper"
+    "locationConfig"
     "marketPlace"
 )
 
@@ -25,4 +28,8 @@ done
 
 
 
-# seed, cropType, cropVariety, cropCategory, livestock, season, soil, extensionequipment, pesticide, insecticide, fertilizer, locationObject, locationMapper, marketPlace
+# seed, cropType, cropVariety, cropCategory, livestock, livestockBreed, livestockCategory, season, soil, extensionequipment, pesticide, insecticide, fertilizer, locationObject, locationMapper, locationConfig, marketPlace
+#
+# Note: the "audit" catalogue is also generated from these templates but is deliberately
+# NOT listed here - its service impl is hand-maintained (AuditService backs AuditLogService),
+# so it must not be swept away by deleteEntities.sh or regenerated.

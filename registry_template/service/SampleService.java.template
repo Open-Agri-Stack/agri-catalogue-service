@@ -9,34 +9,35 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface {{service_name_pascal}}Service {
 
-    CustomResponse create{{service_name_pascal}}(JsonNode {{service_name_camel}}Entity);
+    // token: the raw Authorization header from the caller
+    CustomResponse create{{service_name_pascal}}(JsonNode {{service_name_camel}}Entity, String token);
 
     CustomResponse update{{service_name_pascal}}(String id, JsonNode {{service_name_camel}}Entity);
 
     // Lifecycle: create an incomplete DRAFT (relaxed validation)
-    CustomResponse draft{{service_name_pascal}}(JsonNode {{service_name_camel}}Entity);
+    CustomResponse draft{{service_name_pascal}}(JsonNode {{service_name_camel}}Entity, String token);
 
     // Lifecycle: (re-)submit a DRAFT/REWORK record for approval -> PENDING (full validation)
-    CustomResponse add{{service_name_pascal}}(String id, JsonNode {{service_name_camel}}Entity);
+    CustomResponse add{{service_name_pascal}}(String id, JsonNode {{service_name_camel}}Entity, String token);
 
     // Lifecycle: PENDING -> APPROVED | REJECTED | REWORK
-    CustomResponse approve{{service_name_pascal}}(LifecycleRequest request);
+    CustomResponse approve{{service_name_pascal}}(LifecycleRequest request, String token);
 
     // Lifecycle: APPROVED -> ACTIVE(published) | REJECTED | REWORK | PENDING
-    CustomResponse review{{service_name_pascal}}(LifecycleRequest request);
+    CustomResponse review{{service_name_pascal}}(LifecycleRequest request, String token);
 
     // Toggle a live record between ACTIVE and INACTIVE (rejects any other status)
-    CustomResponse toggleStatus(String id);
+    CustomResponse toggleStatus(String id, String token);
 
-    CustomResponse search{{service_name_pascal}}(SearchCriteria searchCriteria);
+    CustomResponse search{{service_name_pascal}}(SearchCriteria searchCriteria, String token);
 
     CustomResponse assign{{service_name_pascal}}(JsonNode {{service_name_camel}}Entity, String token);
 
-    CustomResponse read(String id);
+    CustomResponse read(String id, String token);
 
-    CustomResponse delete(String id);
+    CustomResponse delete(String id, String token);
 
-    CustomResponse importData(MultipartFile file);
+    CustomResponse importData(MultipartFile file, String token);
 
     // Drops the ES index and rebuilds it from the primary store (Postgres); skips DELETED records
     CustomResponse loadFromPrimary{{service_name_pascal}}();

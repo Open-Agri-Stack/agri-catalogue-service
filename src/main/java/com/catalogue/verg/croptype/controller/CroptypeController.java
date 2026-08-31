@@ -26,47 +26,57 @@ public class CroptypeController {
 
     //@PostMapping("/v1/create")
     public ResponseEntity<CustomResponse> create(@RequestBody JsonNode croptypeDetails) {
-        CustomResponse response = croptypeService.createCroptype(croptypeDetails);
+        CustomResponse response = croptypeService.createCroptype(croptypeDetails, null);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Lifecycle: create an incomplete DRAFT (relaxed validation)
     @PostMapping("/v1/draft")
-    public ResponseEntity<CustomResponse> draft(@RequestBody JsonNode croptypeDetails) {
+    public ResponseEntity<CustomResponse> draft(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody JsonNode croptypeDetails) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = croptypeService.draftCroptype(croptypeDetails);
+        CustomResponse response = croptypeService.draftCroptype(croptypeDetails, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Creates a new record (full validation). With the lifecycle on it lands PENDING and has
     // to be approved then reviewed; with the lifecycle off it lands ACTIVE straight away.
     @PostMapping("/v1/add")
-    public ResponseEntity<CustomResponse> add(@RequestBody JsonNode croptypeDetails) {
-        CustomResponse response = croptypeService.createCroptype(croptypeDetails);
+    public ResponseEntity<CustomResponse> add(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody JsonNode croptypeDetails) {
+        CustomResponse response = croptypeService.createCroptype(croptypeDetails, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Lifecycle: (re-)submit an existing DRAFT/REWORK record for approval (PENDING, full validation)
     @PutMapping("/v1/add/{id}")
-    public ResponseEntity<CustomResponse> addById(@PathVariable String id, @RequestBody JsonNode croptypeDetails) {
+    public ResponseEntity<CustomResponse> addById(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @PathVariable String id, @RequestBody JsonNode croptypeDetails) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = croptypeService.addCroptype(id, croptypeDetails);
+        CustomResponse response = croptypeService.addCroptype(id, croptypeDetails, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Lifecycle: PENDING -> APPROVED | REJECTED | REWORK
     @PutMapping("/v1/approve")
-    public ResponseEntity<CustomResponse> approve(@RequestBody LifecycleRequest request) {
+    public ResponseEntity<CustomResponse> approve(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody LifecycleRequest request) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = croptypeService.approveCroptype(request);
+        CustomResponse response = croptypeService.approveCroptype(request, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     // Lifecycle: APPROVED -> ACTIVE(published) | REJECTED | REWORK
     @PutMapping("/v1/review")
-    public ResponseEntity<CustomResponse> review(@RequestBody LifecycleRequest request) {
+    public ResponseEntity<CustomResponse> review(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody LifecycleRequest request) {
         lifecyclePolicy.requireEnabled(CATALOGUE_NAME);
-        CustomResponse response = croptypeService.reviewCroptype(request);
+        CustomResponse response = croptypeService.reviewCroptype(request, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -74,20 +84,26 @@ public class CroptypeController {
     // Deliberately NOT gated: plain activate/deactivate, not part of the approval chain, and
     // with the lifecycle off it is the only way to take a record offline short of deleting it.
     @PutMapping("/v1/toggle/{id}")
-    public ResponseEntity<CustomResponse> toggle(@PathVariable String id) {
-        CustomResponse response = croptypeService.toggleStatus(id);
+    public ResponseEntity<CustomResponse> toggle(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @PathVariable String id) {
+        CustomResponse response = croptypeService.toggleStatus(id, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     @PostMapping("/v1/search")
-    public ResponseEntity<?> search(@RequestBody SearchCriteria searchCriteria) {
-        CustomResponse response = croptypeService.searchCroptype(searchCriteria);
+    public ResponseEntity<?> search(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody SearchCriteria searchCriteria) {
+        CustomResponse response = croptypeService.searchCroptype(searchCriteria, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     @GetMapping("/v1/read/{id}")
-    public ResponseEntity<?> read(@PathVariable String id) {
-        CustomResponse response = croptypeService.read(id);
+    public ResponseEntity<?> read(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @PathVariable String id) {
+        CustomResponse response = croptypeService.read(id, token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -98,14 +114,18 @@ public class CroptypeController {
     }
 
     @DeleteMapping("/v1/delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
-        CustomResponse response = croptypeService.delete(id);
+    public ResponseEntity<?> delete(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @PathVariable String id) {
+        CustomResponse response = croptypeService.delete(id, token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/v1/import")
-    public ResponseEntity<CustomResponse> importData(@RequestParam("file") MultipartFile file) {
-        CustomResponse response = croptypeService.importData(file);
+    public ResponseEntity<CustomResponse> importData(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestParam("file") MultipartFile file) {
+        CustomResponse response = croptypeService.importData(file, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 

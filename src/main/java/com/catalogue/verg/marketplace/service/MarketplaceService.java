@@ -9,34 +9,35 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface MarketplaceService {
 
-    CustomResponse createMarketplace(JsonNode marketplaceEntity);
+    // token: the raw Authorization header from the caller
+    CustomResponse createMarketplace(JsonNode marketplaceEntity, String token);
 
     CustomResponse updateMarketplace(String id, JsonNode marketplaceEntity);
 
     // Lifecycle: create an incomplete DRAFT (relaxed validation)
-    CustomResponse draftMarketplace(JsonNode marketplaceEntity);
+    CustomResponse draftMarketplace(JsonNode marketplaceEntity, String token);
 
     // Lifecycle: (re-)submit a DRAFT/REWORK record for approval -> PENDING (full validation)
-    CustomResponse addMarketplace(String id, JsonNode marketplaceEntity);
+    CustomResponse addMarketplace(String id, JsonNode marketplaceEntity, String token);
 
     // Lifecycle: PENDING -> APPROVED | REJECTED | REWORK
-    CustomResponse approveMarketplace(LifecycleRequest request);
+    CustomResponse approveMarketplace(LifecycleRequest request, String token);
 
     // Lifecycle: APPROVED -> ACTIVE(published) | REJECTED | REWORK | PENDING
-    CustomResponse reviewMarketplace(LifecycleRequest request);
+    CustomResponse reviewMarketplace(LifecycleRequest request, String token);
 
     // Toggle a live record between ACTIVE and INACTIVE (rejects any other status)
-    CustomResponse toggleStatus(String id);
+    CustomResponse toggleStatus(String id, String token);
 
-    CustomResponse searchMarketplace(SearchCriteria searchCriteria);
+    CustomResponse searchMarketplace(SearchCriteria searchCriteria, String token);
 
     CustomResponse assignMarketplace(JsonNode marketplaceEntity, String token);
 
-    CustomResponse read(String id);
+    CustomResponse read(String id, String token);
 
-    CustomResponse delete(String id);
+    CustomResponse delete(String id, String token);
 
-    CustomResponse importData(MultipartFile file);
+    CustomResponse importData(MultipartFile file, String token);
 
     // Drops the ES index and rebuilds it from the primary store (Postgres); skips DELETED records
     CustomResponse loadFromPrimaryMarketplace();

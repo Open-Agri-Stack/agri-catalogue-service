@@ -65,7 +65,7 @@ public class AuditLogService {
      * @param createdOn           SOURCE entity record's createdOn (optional; omitted when null)
      * @param updatedOn           SOURCE entity record's updatedOn (optional; omitted when null)
      */
-    public void logAudit(String entityId, String entityName, String operation, String auditStatus,
+    public void logAudit(String entityId, String entityName, String userId, String userRole, String functionRole, String operation, String auditStatus,
                          JsonNode entityBeforeChanges, JsonNode entityAfterChanges,
                          Timestamp createdOn, Timestamp updatedOn) {
         try {
@@ -74,9 +74,9 @@ public class AuditLogService {
             // Always present (actor identity defaulted to placeholders until real context exists).
             node.put(FIELD_ENTITY_NAME, entityName);
             node.put(FIELD_OPERATION, operation);
-            node.put(FIELD_USER_ID, Constants.AUDIT_DEFAULT_USER_ID);
-            node.put(FIELD_USER_NAME, Constants.AUDIT_DEFAULT_USER_NAME);
-            node.put(FIELD_USER_ROLE, Constants.AUDIT_DEFAULT_USER_ROLE);
+            node.put(FIELD_USER_ID, userId);
+            node.put(FIELD_USER_NAME, userRole);
+            node.put(FIELD_USER_ROLE, functionRole);
 
             node.put(FIELD_ENTITY_AFTER, stringify(entityAfterChanges));
 
