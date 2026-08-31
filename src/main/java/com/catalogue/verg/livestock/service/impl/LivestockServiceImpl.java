@@ -46,7 +46,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
+import com.catalogue.verg.livestock.util.NotificationUtil;
+import com.catalogue.verg.livestock.constants.NotificationTemplateConstants;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.catalogue.verg.livestock.constants.NotificationTemplate;
 
 @Service
 @Slf4j
@@ -87,6 +90,7 @@ public class LivestockServiceImpl implements LivestockService {
     @Autowired
     private LifecyclePolicy lifecyclePolicy;
 
+    private final NotificationUtil notificationUtil;
     /**
      * Catalogue name recorded on every audit row emitted by this service. Doubles as the key
      * this catalogue is looked up by in the lifecycle switches ({@link LifecyclePolicy}).
@@ -98,23 +102,39 @@ public class LivestockServiceImpl implements LivestockService {
     @Value("${spring.redis.cacheTtl}")
     private long searchResultRedisTtl;
 
+    public LivestockServiceImpl(NotificationUtil notificationUtil) {
+        this.notificationUtil = notificationUtil;
+    }
+
     @Override
     public CustomResponse createLivestock(JsonNode livestockEntity) {
         log.info("LivestockServiceImpl::createLivestock:entered the method: " + livestockEntity);
+
         CustomResponse response = new CustomResponse();
-        payloadValidation.validatePayload(Constants.LIVESTOCK_VALIDATION_FILE_JSON, livestockEntity);
+
+        payloadValidation.validatePayload(
+                Constants.LIVESTOCK_VALIDATION_FILE_JSON,
+                livestockEntity
+        );
 
         log.debug("LivestockServiceImpl::createLivestock:validated the payload");
+
         try {
             log.info("LivestockServiceImpl::createLivestock:creating livestock");
+
             LivestockEntity livestockEntity1 = new LivestockEntity();
+
             // Generate Primary Key
-            String primaryID = primaryKeyUtil.generateKey(Constants.LIVESTOCK_VALIDATION_FILE_JSON);
+            String primaryID =
+                    primaryKeyUtil.generateKey(Constants.LIVESTOCK_VALIDATION_FILE_JSON);
+
             livestockEntity1.setLivestockId(primaryID);
+
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            
+
             String initialStatus = lifecyclePolicy.initialStatus(AUDIT_ENTITY_NAME);
+
             livestockEntity1.setCreatedOn(currentTime);
             livestockEntity1.setUpdatedOn(currentTime);
             livestockEntity1.setStatus(initialStatus);
@@ -122,25 +142,86 @@ public class LivestockServiceImpl implements LivestockService {
 
             livestockRepository.save(livestockEntity1);
 
-            log.info("LivestockServiceImpl::createLivestock::persisted livestock in postgres");
-            ObjectNode jsonNode = buildDocument(livestockEntity, initialStatus, currentTime, currentTime);
-            Map<String, Object> map = objectMapper.convertValue(jsonNode, Map.class);
-            esUtilService.addDocument(Constants.LIVESTOCK_INDEX_NAME, Constants.INDEX_TYPE,
-                    String.valueOf(primaryID), map, vergProperties.getElasticLivestockJsonPath());
+            log.info(
+                    "LivestockServiceImpl::createLivestock::persisted livestock in postgres"
+            );
+
+            ObjectNode jsonNode =
+                    buildDocument(
+                            livestockEntity,
+                            initialStatus,
+                            currentTime,
+                            currentTime
+                    );
+
+            Map<String, Object> map =
+                    objectMapper.convertValue(jsonNode, Map.class);
+
+            esUtilService.addDocument(
+                    Constants.LIVESTOCK_INDEX_NAME,
+                    Constants.INDEX_TYPE,
+                    String.valueOf(primaryID),
+                    map,
+                    vergProperties.getElasticLivestockJsonPath()
+            );
+
             cacheService.putCache(primaryID, jsonNode);
+
+          /*  // Fetch the currently authenticated maker
+            String makerName = SecurityContextHolder.getContext().getAuthentication() != null
+                    ? SecurityContextHolder.getContext().getAuthentication().getName()
+                    : "UNKNOWN";
+
+            // Send notification to Supervisor
+            notificationUtil.sendNotification(
+                    NotificationTemplateConstants.NEW_RECORD_SUBMITTED_FOR_REVIEW,
+                    Map.of(
+                            "makerName", "makerName",
+                            "submissionId", primaryID,
+                            "submissionDate", currentTime.toString()
+                    )
+            );
+*/
+            // Send notification to Supervisor
+            notificationUtil.sendNotification(
+                    NotificationTemplateConstants.NEW_RECORD_SUBMITTED_FOR_REVIEW,
+                    Map.of(
+                            "makerName", "LO",
+                            "submissionId", primaryID,
+                            "submissionDate", currentTime.toString()
+                    )
+            );
+
             response.setMessage(Constants.SUCCESSFULLY_CREATED);
+
             map.put(Constants.LIVESTOCK_ID_RQST, primaryID);
+
             response.setResult(map);
             response.setResponseCode(HttpStatus.OK);
-            log.info("LivestockServiceImpl::createLivestock::persisted livestock in OAS");
-            auditLogService.logAudit(primaryID, AUDIT_ENTITY_NAME, "create", initialStatus,
-                    objectMapper.createObjectNode(), livestockEntity,
-                    livestockEntity1.getCreatedOn(), livestockEntity1.getUpdatedOn());
+
+            log.info(
+                    "LivestockServiceImpl::createLivestock::persisted livestock in OAS"
+            );
+
+            auditLogService.logAudit(
+                    primaryID,
+                    AUDIT_ENTITY_NAME,
+                    "create",
+                    initialStatus,
+                    objectMapper.createObjectNode(),
+                    livestockEntity,
+                    livestockEntity1.getCreatedOn(),
+                    livestockEntity1.getUpdatedOn()
+            );
+
             return response;
 
         } catch (Exception e) {
-            throw new CustomException("error while processing", e.getMessage(),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException(
+                    "error while processing",
+                    e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 
@@ -245,7 +326,7 @@ public class LivestockServiceImpl implements LivestockService {
         return response;
     }
 
-    @Override
+    /*@Override
     public CustomResponse updateLivestock(String id, JsonNode livestockEntity) {
         log.info("LivestockServiceImpl::updateLivestock:entered the method with id: {}", id);
         CustomResponse response = new CustomResponse();
@@ -307,13 +388,133 @@ public class LivestockServiceImpl implements LivestockService {
             response.setResponseCode(HttpStatus.OK);
             return response;
 
+        }
+
+        catch (Exception e) {
+            log.error("LivestockServiceImpl::updateLivestock:error while updating record for id: {}", id, e);
+            throw new CustomException("error while processing", e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+        // Send notification to Supervisor
+        notificationUtil.sendNotification(
+                NotificationTemplateConstants.NEW_RECORD_SUBMITTED_FOR_REVIEW,
+                Map.of(
+                        "makerName", "xyz",
+                        "submissionId", primaryID,
+                        "submissionDate", currentTime.toString()
+                )
+        );
+
+        response.setMessage(Constants.SUCCESSFULLY_CREATED);
+
+        map.put(Constants.LIVESTOCK_ID_RQST, primaryID);
+
+        response.setResult(map);
+        response.setResponseCode(HttpStatus.OK);
+
+        log.info(
+                "LivestockServiceImpl::createLivestock::persisted livestock in OAS"
+        );
+
+        auditLogService.logAudit(
+                primaryID,
+                AUDIT_ENTITY_NAME,
+                "create",
+                initialStatus,
+                objectMapper.createObjectNode(),
+                livestockEntity,
+                livestockEntity1.getCreatedOn(),
+                livestockEntity1.getUpdatedOn()
+        );
+
+        return response;
+    }
+*/
+
+    @Override
+    public CustomResponse updateLivestock(String id, JsonNode livestockEntity) {
+        log.info("LivestockServiceImpl::updateLivestock:entered the method with id: {}", id);
+        CustomResponse response = new CustomResponse();
+
+        if (StringUtils.isEmpty(id)) {
+            log.warn("LivestockServiceImpl::updateLivestock:id is null or empty");
+            response.setResponseCode(HttpStatus.BAD_REQUEST);
+            response.setMessage(Constants.ID_NOT_FOUND);
+            return response;
+        }
+
+        payloadValidation.validatePayload(Constants.LIVESTOCK_VALIDATION_FILE_JSON, livestockEntity);
+        log.debug("LivestockServiceImpl::updateLivestock:validated the payload");
+
+        try {
+            Optional<LivestockEntity> entityOptional = livestockRepository.findById(id);
+            if (entityOptional.isEmpty()) {
+                log.warn("LivestockServiceImpl::updateLivestock:no record found for id: {}", id);
+                response.setResponseCode(HttpStatus.NOT_FOUND);
+                response.setMessage(Constants.INVALID_ID);
+                return response;
+            }
+
+            LivestockEntity livestockEntity1 = entityOptional.get();
+
+            if (Constants.DELETED.equals(livestockEntity1.getStatus())) {
+                log.warn("LivestockServiceImpl::updateLivestock:record already deleted for id: {}", id);
+                response.setResponseCode(HttpStatus.BAD_REQUEST);
+                response.setMessage("Record is already deleted");
+                return response;
+            }
+
+            // Status doesn't change on a plain update — capture it once, used below for both
+            // the ES re-index and deciding which approver (if any) gets notified.
+            String currentStatus = livestockEntity1.getStatus();
+
+            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+            livestockEntity1.setData(livestockEntity);
+            livestockEntity1.setUpdatedOn(currentTime);
+            livestockRepository.save(livestockEntity1);
+            log.info("LivestockServiceImpl::updateLivestock:updated record in postgres for id: {}", id);
+
+            ObjectNode jsonNode = buildDocument(livestockEntity, currentStatus,
+                    livestockEntity1.getCreatedOn(), currentTime);
+            Map<String, Object> map = objectMapper.convertValue(jsonNode, Map.class);
+            esUtilService.updateDocument(Constants.LIVESTOCK_INDEX_NAME, Constants.INDEX_TYPE,
+                    id, map, vergProperties.getElasticLivestockJsonPath());
+            log.info("LivestockServiceImpl::updateLivestock:updated document in elasticsearch for id: {}", id);
+
+            cacheService.putCache(id, jsonNode);
+            log.info("LivestockServiceImpl::updateLivestock:refreshed cache for id: {}", id);
+
+            // Notify the current approver only if the record is sitting at PENDING (L1) or APPROVED (L2).
+            // Any other status (DRAFT, REWORK, ACTIVE, REJECTED) sends nothing.
+            NotificationTemplate template = resolvePlainUpdateTemplate(currentStatus);
+            if (template != null) {
+                String makerName = currentActorName();
+                notificationUtil.sendNotification(
+                        template,
+                        Map.of(
+                                "makerName", makerName,
+                                "submissionId", id,
+                                "updateDate", currentTime.toString()
+                        )
+                );
+                log.info("LivestockServiceImpl::updateLivestock:notification {} sent for id: {} by: {}",
+                        template.templateCode(), id, makerName);
+            }
+
+            map.put(Constants.LIVESTOCK_ID_RQST, id);
+            response.setResult(map);
+            response.setMessage(Constants.SUCCESSFULLY_UPDATED);
+            response.setResponseCode(HttpStatus.OK);
+            return response;
+
         } catch (Exception e) {
             log.error("LivestockServiceImpl::updateLivestock:error while updating record for id: {}", id, e);
             throw new CustomException("error while processing", e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
     @Override
     public CustomResponse delete(String id) {
         log.info("LivestockServiceImpl::delete:inside the method with id: {}", id);
@@ -440,10 +641,10 @@ public class LivestockServiceImpl implements LivestockService {
         }
     }
 
+
     @Override
     public CustomResponse addLivestock(String id, JsonNode livestockEntity) {
         log.info("LivestockServiceImpl::addLivestock:entered the method with id: {}", id);
-        // Guard before the try block: the 404 must not be swallowed by the catch below
         lifecyclePolicy.requireEnabled(AUDIT_ENTITY_NAME);
         CustomResponse response = new CustomResponse();
         if (StringUtils.isEmpty(id)) {
@@ -451,7 +652,6 @@ public class LivestockServiceImpl implements LivestockService {
             response.setMessage(Constants.ID_NOT_FOUND);
             return response;
         }
-        // Full validation: all required fields must be present to submit for approval
         payloadValidation.validatePayload(Constants.LIVESTOCK_VALIDATION_FILE_JSON, livestockEntity);
         log.debug("LivestockServiceImpl::addLivestock:validated the payload");
         try {
@@ -462,7 +662,6 @@ public class LivestockServiceImpl implements LivestockService {
                 return response;
             }
             LivestockEntity livestockEntity1 = entityOptional.get();
-            // Only DRAFT or REWORK records can be (re-)submitted for approval
             if (!LifecycleUtil.ADD_PROMOTABLE.contains(livestockEntity1.getStatus())) {
                 log.warn("LivestockServiceImpl::addLivestock:record {} not in DRAFT/REWORK (status={})",
                         id, livestockEntity1.getStatus());
@@ -470,6 +669,10 @@ public class LivestockServiceImpl implements LivestockService {
                 response.setMessage(Constants.INVALID_STATUS_TRANSITION);
                 return response;
             }
+
+            // Capture status BEFORE overwrite, so we know submit (DRAFT) vs resubmit (REWORK)
+            String previousStatus = livestockEntity1.getStatus();
+
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = livestockEntity1.getData();
             livestockEntity1.setData(livestockEntity);
@@ -484,6 +687,21 @@ public class LivestockServiceImpl implements LivestockService {
             esUtilService.updateDocument(Constants.LIVESTOCK_INDEX_NAME, Constants.INDEX_TYPE,
                     id, map, vergProperties.getElasticLivestockJsonPath());
             cacheService.putCache(id, jsonNode);
+
+            String makerName = currentActorName();
+
+            NotificationTemplate template = resolveSubmitTemplate(previousStatus);
+            notificationUtil.sendNotification(
+                    template,
+                    Map.of(
+                            "makerName", makerName,
+                            "submissionId", id,
+                            "submissionDate", currentTime.toString()
+                    )
+            );
+            log.info("LivestockServiceImpl::addLivestock:notification {} sent for id: {} by maker: {}",
+                    template.templateCode(), id, makerName);
+
             map.put(Constants.LIVESTOCK_ID_RQST, id);
             response.setResult(map);
             response.setMessage(Constants.SUCCESSFULLY_UPDATED);
@@ -573,7 +791,7 @@ public class LivestockServiceImpl implements LivestockService {
      * Shared status-transition logic for approve/review. Validates the id and requested target status,
      * enforces the required current status, then persists the new status to Postgres, ES and Redis.
      */
-    private CustomResponse transitionStatus(LifecycleRequest request, String operation,
+    /*private CustomResponse transitionStatus(LifecycleRequest request, String operation,
                                             String requiredCurrentStatus, Set<String> allowedTargets) {
         CustomResponse response = new CustomResponse();
         if (request == null || StringUtils.isEmpty(request.getId())) {
@@ -630,13 +848,169 @@ public class LivestockServiceImpl implements LivestockService {
             throw new CustomException("error while processing", e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }*/
+    private CustomResponse transitionStatus(LifecycleRequest request, String operation,
+                                            String requiredCurrentStatus, Set<String> allowedTargets) {
+        CustomResponse response = new CustomResponse();
+        if (request == null || StringUtils.isEmpty(request.getId())) {
+            response.setResponseCode(HttpStatus.BAD_REQUEST);
+            response.setMessage(Constants.ID_NOT_FOUND);
+            return response;
+        }
+        String id = request.getId();
+        String targetStatus = LifecycleUtil.normalizeTarget(request.getStatus());
+        if (targetStatus == null || !allowedTargets.contains(targetStatus)) {
+            log.warn("LivestockServiceImpl::transitionStatus:invalid target status '{}' for id {}",
+                    request.getStatus(), id);
+            response.setResponseCode(HttpStatus.BAD_REQUEST);
+            response.setMessage(Constants.INVALID_STATUS);
+            return response;
+        }
+        try {
+            Optional<LivestockEntity> entityOptional = livestockRepository.findById(id);
+            if (entityOptional.isEmpty()) {
+                response.setResponseCode(HttpStatus.NOT_FOUND);
+                response.setMessage(Constants.INVALID_ID);
+                return response;
+            }
+            LivestockEntity livestockEntity1 = entityOptional.get();
+            if (!requiredCurrentStatus.equals(livestockEntity1.getStatus())) {
+                log.warn("LivestockServiceImpl::transitionStatus:record {} is {}, requires {}",
+                        id, livestockEntity1.getStatus(), requiredCurrentStatus);
+                response.setResponseCode(HttpStatus.CONFLICT);
+                response.setMessage(Constants.INVALID_STATUS_TRANSITION);
+                return response;
+            }
+            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+            livestockEntity1.setStatus(targetStatus);
+            livestockEntity1.setUpdatedOn(currentTime);
+            livestockRepository.save(livestockEntity1);
+            log.info("LivestockServiceImpl::transitionStatus:record {} moved {} -> {}",
+                    id, requiredCurrentStatus, targetStatus);
+
+            ObjectNode jsonNode = buildDocument(livestockEntity1.getData(), targetStatus,
+                    livestockEntity1.getCreatedOn(), currentTime);
+            Map<String, Object> map = objectMapper.convertValue(jsonNode, Map.class);
+            esUtilService.updateDocument(Constants.LIVESTOCK_INDEX_NAME, Constants.INDEX_TYPE,
+                    id, map, vergProperties.getElasticLivestockJsonPath());
+            cacheService.putCache(id, jsonNode);
+
+            String makerName = currentActorName();
+            NotificationTemplate template = resolveDecisionTemplate(operation, targetStatus);
+            notificationUtil.sendNotification(
+                    template,
+                    Map.of(
+                            "makerName", makerName,
+                            "submissionId", id,
+                            "actionDate", currentTime.toString()
+                    )
+            );
+            log.info("LivestockServiceImpl::transitionStatus:notification {} sent for id: {} by: {}",
+                    template.templateCode(), id, makerName);
+
+            map.put(Constants.LIVESTOCK_ID_RQST, id);
+            response.setResult(map);
+            response.setMessage(Constants.SUCCESSFULLY_UPDATED);
+            response.setResponseCode(HttpStatus.OK);
+            auditLogService.logAudit(id, AUDIT_ENTITY_NAME, operation, targetStatus,
+                    livestockEntity1.getData(), livestockEntity1.getData(),
+                    livestockEntity1.getCreatedOn(), livestockEntity1.getUpdatedOn());
+            return response;
+        } catch (Exception e) {
+            throw new CustomException("error while processing", e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    /**
+     * Picks the "submitted" template based on the record's status BEFORE this submission —
+     * first-time submit (DRAFT) vs. resubmission after correction (REWORK).
+     */
+    /**
+     * Picks the notification template for a plain (non-lifecycle) update, based on which
+     * approver currently owns the record: L1 supervisor for PENDING, L2 admin for APPROVED.
+     * Returns null for any other status — no notification is sent for those.
+     */
+   /* private NotificationTemplate resolvePlainUpdateTemplate(String currentStatus) {
+        if (Constants.PENDING.equals(currentStatus)) {
+            return NotificationTemplateConstants.RECORD_RESUBMITTED_FOR_REVIEW;
+        }
+        if (Constants.APPROVED.equals(currentStatus)) {
+            return NotificationTemplateConstants.RECORD_REVIEWED_BY_ADMIN_L2;
+        }
+        return null;
+    }*/
+
+    private NotificationTemplate resolveSubmitTemplate(String previousStatus) {
+        if (Constants.REWORK.equals(previousStatus)) {
+            log.info("RECORD_RESUBMITTED_FOR_REVIEW");
+            return NotificationTemplateConstants.RECORD_RESUBMITTED_FOR_REVIEW;
+        }
+        return NotificationTemplateConstants.NEW_RECORD_SUBMITTED_FOR_REVIEW;
     }
 
+    /**
+     * Picks the approve/reject/send-back template based on the operation
+     * ("approve" = L1 supervisor, "review" = L2 admin) and the requested target status.
+     */
+    private NotificationTemplate resolveDecisionTemplate(String operation, String targetStatus) {
+        boolean isL2 = "review".equals(operation);
+
+        if (Constants.REJECTED.equals(targetStatus)) {
+            log.info("RECORD_REJECTED_BY_ADMIN_L2 Or RECORD_REJECTED_BY_SUPERVISOR");
+            return isL2
+                    ? NotificationTemplateConstants.RECORD_REJECTED_BY_ADMIN_L2
+                    : NotificationTemplateConstants.RECORD_REJECTED_BY_SUPERVISOR;
+        }
+        if (Constants.REWORK.equals(targetStatus)) {
+            log.info("RECORD_SENT_BACK_FOR_CORRECTION");
+            return NotificationTemplateConstants.RECORD_SENT_BACK_FOR_CORRECTION;
+        }
+        // approve: PENDING -> APPROVED | review: APPROVED -> ACTIVE
+        return isL2
+                ? NotificationTemplateConstants.RECORD_APPROVED_BY_ADMIN_L2
+                : NotificationTemplateConstants.RECORD_APPROVED_BY_SUPERVISOR;
+    }
+
+    /** Resolves the currently authenticated maker/actor name for notification payloads. */
+    private String currentActorName() {
+        return SecurityContextHolder.getContext().getAuthentication() != null
+                ? SecurityContextHolder.getContext().getAuthentication().getName()
+                : "UNKNOWN";
+    }
     /**
      * Builds the projection stored in Elasticsearch and Redis (and returned by read): the payload
      * plus the lifecycle status and the Postgres createdOn/updatedOn timestamps (ISO-8601). ES keeps
      * only whitelisted keys, so status/createdOn/updatedOn must be present in esLivestockRequiredFields.json.
      */
+
+    /**
+     * Picks the notification template for a plain (non-lifecycle) update, based on the record's
+     * current lifecycle status — i.e. whoever currently "owns" the record at that stage:
+     *   PENDING  -> owned by L1 Supervisor (awaiting their decision)
+     *   APPROVED -> owned by L2 Admin (awaiting their decision)
+     *   REWORK   -> owned by L0 Maker (needs correction)
+     *   REJECTED -> owned by L0 Maker (final rejection, informational)
+     *   ACTIVE   -> owned by L0 Maker (published, informational)
+     *   DRAFT / anything else -> no owner yet, no notification
+     */
+    private NotificationTemplate resolvePlainUpdateTemplate(String currentStatus) {
+        if (Constants.PENDING.equals(currentStatus)) {
+            return NotificationTemplateConstants.RECORD_RESUBMITTED_FOR_REVIEW;
+        }
+        if (Constants.APPROVED.equals(currentStatus)) {
+            return NotificationTemplateConstants.RECORD_REVIEWED_BY_ADMIN_L2;
+        }
+        if (Constants.REWORK.equals(currentStatus)) {
+            return NotificationTemplateConstants.RECORD_SENT_BACK_FOR_CORRECTION;
+        }
+        if (Constants.REJECTED.equals(currentStatus)) {
+            return NotificationTemplateConstants.RECORD_REJECTED_BY_SUPERVISOR;
+        }
+        if (Constants.ACTIVE.equals(currentStatus)) {
+            return NotificationTemplateConstants.RECORD_APPROVED_BY_ADMIN_L2;
+        }
+        return null;
+    }
     private ObjectNode buildDocument(JsonNode data, String status, Timestamp createdOn, Timestamp updatedOn) {
         ObjectNode node = objectMapper.createObjectNode();
         if (data != null && data.isObject()) {
