@@ -130,6 +130,12 @@ public class InsecticideServiceImpl implements InsecticideService {
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.INSECTICIDE_VALIDATION_FILE_JSON);
             insecticideEntity1.setInsecticideId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (insecticideEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) insecticideEntity).put("createdBy", makerId);
+                ((ObjectNode) insecticideEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class InsecticideServiceImpl implements InsecticideService {
             InsecticideEntity insecticideEntity1 = new InsecticideEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.INSECTICIDE_VALIDATION_FILE_JSON);
             insecticideEntity1.setInsecticideId(primaryID);
+            if (insecticideEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) insecticideEntity).put("createdBy", makerId);
+                ((ObjectNode) insecticideEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             insecticideEntity1.setCreatedOn(currentTime);
             insecticideEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class InsecticideServiceImpl implements InsecticideService {
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = insecticideEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (insecticideEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) insecticideEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) insecticideEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             insecticideEntity1.setData(insecticideEntity);
             insecticideEntity1.setStatus(Constants.PENDING);
             insecticideEntity1.setUpdatedOn(currentTime);

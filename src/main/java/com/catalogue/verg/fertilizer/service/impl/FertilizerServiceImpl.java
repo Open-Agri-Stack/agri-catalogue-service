@@ -130,6 +130,12 @@ public class FertilizerServiceImpl implements FertilizerService {
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.FERTILIZER_VALIDATION_FILE_JSON);
             fertilizerEntity1.setFertilizerId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (fertilizerEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) fertilizerEntity).put("createdBy", makerId);
+                ((ObjectNode) fertilizerEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class FertilizerServiceImpl implements FertilizerService {
             FertilizerEntity fertilizerEntity1 = new FertilizerEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.FERTILIZER_VALIDATION_FILE_JSON);
             fertilizerEntity1.setFertilizerId(primaryID);
+            if (fertilizerEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) fertilizerEntity).put("createdBy", makerId);
+                ((ObjectNode) fertilizerEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             fertilizerEntity1.setCreatedOn(currentTime);
             fertilizerEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class FertilizerServiceImpl implements FertilizerService {
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = fertilizerEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (fertilizerEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) fertilizerEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) fertilizerEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             fertilizerEntity1.setData(fertilizerEntity);
             fertilizerEntity1.setStatus(Constants.PENDING);
             fertilizerEntity1.setUpdatedOn(currentTime);

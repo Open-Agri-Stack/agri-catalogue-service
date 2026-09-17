@@ -130,6 +130,12 @@ public class CropcategoryServiceImpl implements CropcategoryService {
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.CROPCATEGORY_VALIDATION_FILE_JSON);
             cropcategoryEntity1.setCropcategoryId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (cropcategoryEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) cropcategoryEntity).put("createdBy", makerId);
+                ((ObjectNode) cropcategoryEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class CropcategoryServiceImpl implements CropcategoryService {
             CropcategoryEntity cropcategoryEntity1 = new CropcategoryEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.CROPCATEGORY_VALIDATION_FILE_JSON);
             cropcategoryEntity1.setCropcategoryId(primaryID);
+            if (cropcategoryEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) cropcategoryEntity).put("createdBy", makerId);
+                ((ObjectNode) cropcategoryEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             cropcategoryEntity1.setCreatedOn(currentTime);
             cropcategoryEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class CropcategoryServiceImpl implements CropcategoryService {
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = cropcategoryEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (cropcategoryEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) cropcategoryEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) cropcategoryEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             cropcategoryEntity1.setData(cropcategoryEntity);
             cropcategoryEntity1.setStatus(Constants.PENDING);
             cropcategoryEntity1.setUpdatedOn(currentTime);

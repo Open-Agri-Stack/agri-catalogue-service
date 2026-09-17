@@ -130,6 +130,12 @@ public class PesticideServiceImpl implements PesticideService {
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.PESTICIDE_VALIDATION_FILE_JSON);
             pesticideEntity1.setPesticideId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (pesticideEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) pesticideEntity).put("createdBy", makerId);
+                ((ObjectNode) pesticideEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class PesticideServiceImpl implements PesticideService {
             PesticideEntity pesticideEntity1 = new PesticideEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.PESTICIDE_VALIDATION_FILE_JSON);
             pesticideEntity1.setPesticideId(primaryID);
+            if (pesticideEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) pesticideEntity).put("createdBy", makerId);
+                ((ObjectNode) pesticideEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             pesticideEntity1.setCreatedOn(currentTime);
             pesticideEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class PesticideServiceImpl implements PesticideService {
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = pesticideEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (pesticideEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) pesticideEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) pesticideEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             pesticideEntity1.setData(pesticideEntity);
             pesticideEntity1.setStatus(Constants.PENDING);
             pesticideEntity1.setUpdatedOn(currentTime);

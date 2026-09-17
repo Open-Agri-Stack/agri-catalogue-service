@@ -130,6 +130,12 @@ public class {{service_name_pascal}}ServiceImpl implements {{service_name_pascal
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.{{service_name_upper}}_VALIDATION_FILE_JSON);
             {{service_name_camel}}Entity1.set{{service_name_pascal}}Id(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if ({{service_name_camel}}Entity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) {{service_name_camel}}Entity).put("createdBy", makerId);
+                ((ObjectNode) {{service_name_camel}}Entity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class {{service_name_pascal}}ServiceImpl implements {{service_name_pascal
             {{service_name_pascal}}Entity {{service_name_camel}}Entity1 = new {{service_name_pascal}}Entity();
             String primaryID = primaryKeyUtil.generateKey(Constants.{{service_name_upper}}_VALIDATION_FILE_JSON);
             {{service_name_camel}}Entity1.set{{service_name_pascal}}Id(primaryID);
+            if ({{service_name_camel}}Entity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) {{service_name_camel}}Entity).put("createdBy", makerId);
+                ((ObjectNode) {{service_name_camel}}Entity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             {{service_name_camel}}Entity1.setCreatedOn(currentTime);
             {{service_name_camel}}Entity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class {{service_name_pascal}}ServiceImpl implements {{service_name_pascal
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = {{service_name_camel}}Entity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if ({{service_name_camel}}Entity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) {{service_name_camel}}Entity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) {{service_name_camel}}Entity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             {{service_name_camel}}Entity1.setData({{service_name_camel}}Entity);
             {{service_name_camel}}Entity1.setStatus(Constants.PENDING);
             {{service_name_camel}}Entity1.setUpdatedOn(currentTime);

@@ -130,6 +130,12 @@ public class SeedServiceImpl implements SeedService {
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.SEED_VALIDATION_FILE_JSON);
             seedEntity1.setSeedId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (seedEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) seedEntity).put("createdBy", makerId);
+                ((ObjectNode) seedEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class SeedServiceImpl implements SeedService {
             SeedEntity seedEntity1 = new SeedEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.SEED_VALIDATION_FILE_JSON);
             seedEntity1.setSeedId(primaryID);
+            if (seedEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) seedEntity).put("createdBy", makerId);
+                ((ObjectNode) seedEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             seedEntity1.setCreatedOn(currentTime);
             seedEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class SeedServiceImpl implements SeedService {
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = seedEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (seedEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) seedEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) seedEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             seedEntity1.setData(seedEntity);
             seedEntity1.setStatus(Constants.PENDING);
             seedEntity1.setUpdatedOn(currentTime);

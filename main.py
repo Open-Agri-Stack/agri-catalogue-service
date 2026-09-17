@@ -196,7 +196,9 @@ class CreateRegistry:
             f"{self.camel}Id": {"type": "keyword"},
             "status": {"type": "keyword"},
             "createdOn": {"type": "date"},
-            "updatedOn": {"type": "date"}
+            "updatedOn": {"type": "date"},
+            "createdBy": {"type": "keyword"},
+            "updatedBy": {"type": "keyword"}
         }
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         with open(output_path, "w") as f:

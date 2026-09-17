@@ -43,5 +43,11 @@
     },
     "updatedOn": {
         "type": "date"
+    },
+    "createdBy": {
+        "type": "keyword"
+    },
+    "updatedBy": {
+        "type": "keyword"
     }
 }

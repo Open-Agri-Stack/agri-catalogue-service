@@ -130,6 +130,12 @@ public class LocationconfigServiceImpl implements LocationconfigService {
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.LOCATIONCONFIG_VALIDATION_FILE_JSON);
             locationconfigEntity1.setLocationconfigId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (locationconfigEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) locationconfigEntity).put("createdBy", makerId);
+                ((ObjectNode) locationconfigEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class LocationconfigServiceImpl implements LocationconfigService {
             LocationconfigEntity locationconfigEntity1 = new LocationconfigEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.LOCATIONCONFIG_VALIDATION_FILE_JSON);
             locationconfigEntity1.setLocationconfigId(primaryID);
+            if (locationconfigEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) locationconfigEntity).put("createdBy", makerId);
+                ((ObjectNode) locationconfigEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             locationconfigEntity1.setCreatedOn(currentTime);
             locationconfigEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class LocationconfigServiceImpl implements LocationconfigService {
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = locationconfigEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (locationconfigEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) locationconfigEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) locationconfigEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             locationconfigEntity1.setData(locationconfigEntity);
             locationconfigEntity1.setStatus(Constants.PENDING);
             locationconfigEntity1.setUpdatedOn(currentTime);

@@ -130,6 +130,12 @@ public class LocationobjectServiceImpl implements LocationobjectService {
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.LOCATIONOBJECT_VALIDATION_FILE_JSON);
             locationobjectEntity1.setLocationobjectId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (locationobjectEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) locationobjectEntity).put("createdBy", makerId);
+                ((ObjectNode) locationobjectEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class LocationobjectServiceImpl implements LocationobjectService {
             LocationobjectEntity locationobjectEntity1 = new LocationobjectEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.LOCATIONOBJECT_VALIDATION_FILE_JSON);
             locationobjectEntity1.setLocationobjectId(primaryID);
+            if (locationobjectEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) locationobjectEntity).put("createdBy", makerId);
+                ((ObjectNode) locationobjectEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             locationobjectEntity1.setCreatedOn(currentTime);
             locationobjectEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class LocationobjectServiceImpl implements LocationobjectService {
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = locationobjectEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (locationobjectEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) locationobjectEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) locationobjectEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             locationobjectEntity1.setData(locationobjectEntity);
             locationobjectEntity1.setStatus(Constants.PENDING);
             locationobjectEntity1.setUpdatedOn(currentTime);

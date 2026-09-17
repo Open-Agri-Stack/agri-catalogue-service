@@ -130,6 +130,12 @@ public class MarketplaceServiceImpl implements MarketplaceService {
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.MARKETPLACE_VALIDATION_FILE_JSON);
             marketplaceEntity1.setMarketplaceId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (marketplaceEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) marketplaceEntity).put("createdBy", makerId);
+                ((ObjectNode) marketplaceEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class MarketplaceServiceImpl implements MarketplaceService {
             MarketplaceEntity marketplaceEntity1 = new MarketplaceEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.MARKETPLACE_VALIDATION_FILE_JSON);
             marketplaceEntity1.setMarketplaceId(primaryID);
+            if (marketplaceEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) marketplaceEntity).put("createdBy", makerId);
+                ((ObjectNode) marketplaceEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             marketplaceEntity1.setCreatedOn(currentTime);
             marketplaceEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class MarketplaceServiceImpl implements MarketplaceService {
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = marketplaceEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (marketplaceEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) marketplaceEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) marketplaceEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             marketplaceEntity1.setData(marketplaceEntity);
             marketplaceEntity1.setStatus(Constants.PENDING);
             marketplaceEntity1.setUpdatedOn(currentTime);

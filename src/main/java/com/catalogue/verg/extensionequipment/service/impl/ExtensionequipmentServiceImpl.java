@@ -130,6 +130,12 @@ public class ExtensionequipmentServiceImpl implements ExtensionequipmentService 
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.EXTENSIONEQUIPMENT_VALIDATION_FILE_JSON);
             extensionequipmentEntity1.setExtensionequipmentId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (extensionequipmentEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) extensionequipmentEntity).put("createdBy", makerId);
+                ((ObjectNode) extensionequipmentEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class ExtensionequipmentServiceImpl implements ExtensionequipmentService 
             ExtensionequipmentEntity extensionequipmentEntity1 = new ExtensionequipmentEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.EXTENSIONEQUIPMENT_VALIDATION_FILE_JSON);
             extensionequipmentEntity1.setExtensionequipmentId(primaryID);
+            if (extensionequipmentEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) extensionequipmentEntity).put("createdBy", makerId);
+                ((ObjectNode) extensionequipmentEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             extensionequipmentEntity1.setCreatedOn(currentTime);
             extensionequipmentEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class ExtensionequipmentServiceImpl implements ExtensionequipmentService 
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = extensionequipmentEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (extensionequipmentEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) extensionequipmentEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) extensionequipmentEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             extensionequipmentEntity1.setData(extensionequipmentEntity);
             extensionequipmentEntity1.setStatus(Constants.PENDING);
             extensionequipmentEntity1.setUpdatedOn(currentTime);

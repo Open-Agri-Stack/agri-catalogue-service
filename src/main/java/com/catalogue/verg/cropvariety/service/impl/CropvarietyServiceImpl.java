@@ -130,6 +130,12 @@ public class CropvarietyServiceImpl implements CropvarietyService {
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.CROPVARIETY_VALIDATION_FILE_JSON);
             cropvarietyEntity1.setCropvarietyId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (cropvarietyEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) cropvarietyEntity).put("createdBy", makerId);
+                ((ObjectNode) cropvarietyEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class CropvarietyServiceImpl implements CropvarietyService {
             CropvarietyEntity cropvarietyEntity1 = new CropvarietyEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.CROPVARIETY_VALIDATION_FILE_JSON);
             cropvarietyEntity1.setCropvarietyId(primaryID);
+            if (cropvarietyEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) cropvarietyEntity).put("createdBy", makerId);
+                ((ObjectNode) cropvarietyEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             cropvarietyEntity1.setCreatedOn(currentTime);
             cropvarietyEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class CropvarietyServiceImpl implements CropvarietyService {
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = cropvarietyEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (cropvarietyEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) cropvarietyEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) cropvarietyEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             cropvarietyEntity1.setData(cropvarietyEntity);
             cropvarietyEntity1.setStatus(Constants.PENDING);
             cropvarietyEntity1.setUpdatedOn(currentTime);

@@ -130,6 +130,12 @@ public class LivestockcategoryServiceImpl implements LivestockcategoryService {
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.LIVESTOCKCATEGORY_VALIDATION_FILE_JSON);
             livestockcategoryEntity1.setLivestockcategoryId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (livestockcategoryEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) livestockcategoryEntity).put("createdBy", makerId);
+                ((ObjectNode) livestockcategoryEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class LivestockcategoryServiceImpl implements LivestockcategoryService {
             LivestockcategoryEntity livestockcategoryEntity1 = new LivestockcategoryEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.LIVESTOCKCATEGORY_VALIDATION_FILE_JSON);
             livestockcategoryEntity1.setLivestockcategoryId(primaryID);
+            if (livestockcategoryEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) livestockcategoryEntity).put("createdBy", makerId);
+                ((ObjectNode) livestockcategoryEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             livestockcategoryEntity1.setCreatedOn(currentTime);
             livestockcategoryEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class LivestockcategoryServiceImpl implements LivestockcategoryService {
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = livestockcategoryEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (livestockcategoryEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) livestockcategoryEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) livestockcategoryEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             livestockcategoryEntity1.setData(livestockcategoryEntity);
             livestockcategoryEntity1.setStatus(Constants.PENDING);
             livestockcategoryEntity1.setUpdatedOn(currentTime);

@@ -130,6 +130,12 @@ public class CroptypeServiceImpl implements CroptypeService {
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.CROPTYPE_VALIDATION_FILE_JSON);
             croptypeEntity1.setCroptypeId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (croptypeEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) croptypeEntity).put("createdBy", makerId);
+                ((ObjectNode) croptypeEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class CroptypeServiceImpl implements CroptypeService {
             CroptypeEntity croptypeEntity1 = new CroptypeEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.CROPTYPE_VALIDATION_FILE_JSON);
             croptypeEntity1.setCroptypeId(primaryID);
+            if (croptypeEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) croptypeEntity).put("createdBy", makerId);
+                ((ObjectNode) croptypeEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             croptypeEntity1.setCreatedOn(currentTime);
             croptypeEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class CroptypeServiceImpl implements CroptypeService {
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = croptypeEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (croptypeEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) croptypeEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) croptypeEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             croptypeEntity1.setData(croptypeEntity);
             croptypeEntity1.setStatus(Constants.PENDING);
             croptypeEntity1.setUpdatedOn(currentTime);

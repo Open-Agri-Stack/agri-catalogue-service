@@ -110,20 +110,6 @@ public class NotificationUtil {
                         e.getMessage(),
                         e
                 );
-
-            } catch (Exception e) {
-
-                lastError = e;
-
-                log.error(
-                        "Unexpected error sending notification: templateModule={} templateCode={} attempt={}/{} error={}",
-                        templateModule,
-                        templateCode,
-                        attempt,
-                        MAX_RETRIES,
-                        e.getMessage(),
-                        e
-                );
             }
         }
 

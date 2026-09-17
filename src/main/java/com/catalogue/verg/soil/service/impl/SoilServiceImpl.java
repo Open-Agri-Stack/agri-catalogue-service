@@ -130,6 +130,12 @@ public class SoilServiceImpl implements SoilService {
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.SOIL_VALIDATION_FILE_JSON);
             soilEntity1.setSoilId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (soilEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) soilEntity).put("createdBy", makerId);
+                ((ObjectNode) soilEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class SoilServiceImpl implements SoilService {
             SoilEntity soilEntity1 = new SoilEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.SOIL_VALIDATION_FILE_JSON);
             soilEntity1.setSoilId(primaryID);
+            if (soilEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) soilEntity).put("createdBy", makerId);
+                ((ObjectNode) soilEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             soilEntity1.setCreatedOn(currentTime);
             soilEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class SoilServiceImpl implements SoilService {
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = soilEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (soilEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) soilEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) soilEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             soilEntity1.setData(soilEntity);
             soilEntity1.setStatus(Constants.PENDING);
             soilEntity1.setUpdatedOn(currentTime);

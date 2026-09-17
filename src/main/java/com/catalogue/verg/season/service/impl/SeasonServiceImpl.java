@@ -130,6 +130,12 @@ public class SeasonServiceImpl implements SeasonService {
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.SEASON_VALIDATION_FILE_JSON);
             seasonEntity1.setSeasonId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (seasonEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) seasonEntity).put("createdBy", makerId);
+                ((ObjectNode) seasonEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class SeasonServiceImpl implements SeasonService {
             SeasonEntity seasonEntity1 = new SeasonEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.SEASON_VALIDATION_FILE_JSON);
             seasonEntity1.setSeasonId(primaryID);
+            if (seasonEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) seasonEntity).put("createdBy", makerId);
+                ((ObjectNode) seasonEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             seasonEntity1.setCreatedOn(currentTime);
             seasonEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class SeasonServiceImpl implements SeasonService {
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = seasonEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (seasonEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) seasonEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) seasonEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             seasonEntity1.setData(seasonEntity);
             seasonEntity1.setStatus(Constants.PENDING);
             seasonEntity1.setUpdatedOn(currentTime);

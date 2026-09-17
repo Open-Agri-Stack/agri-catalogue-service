@@ -130,6 +130,12 @@ public class LivestockbreedServiceImpl implements LivestockbreedService {
             // Generate Primary Key
             String primaryID = primaryKeyUtil.generateKey(Constants.LIVESTOCKBREED_VALIDATION_FILE_JSON);
             livestockbreedEntity1.setLivestockbreedId(primaryID);
+            // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
+            if (livestockbreedEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) livestockbreedEntity).put("createdBy", makerId);
+                ((ObjectNode) livestockbreedEntity).put("updatedBy", makerId);
+            }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
@@ -501,6 +507,11 @@ public class LivestockbreedServiceImpl implements LivestockbreedService {
             LivestockbreedEntity livestockbreedEntity1 = new LivestockbreedEntity();
             String primaryID = primaryKeyUtil.generateKey(Constants.LIVESTOCKBREED_VALIDATION_FILE_JSON);
             livestockbreedEntity1.setLivestockbreedId(primaryID);
+            if (livestockbreedEntity instanceof ObjectNode) {
+                String makerId = userContext.path("userId").asText(null);
+                ((ObjectNode) livestockbreedEntity).put("createdBy", makerId);
+                ((ObjectNode) livestockbreedEntity).put("updatedBy", makerId);
+            }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             livestockbreedEntity1.setCreatedOn(currentTime);
             livestockbreedEntity1.setUpdatedOn(currentTime);
@@ -570,6 +581,14 @@ public class LivestockbreedServiceImpl implements LivestockbreedService {
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             JsonNode auditBefore = livestockbreedEntity1.getData();
+            // Preserve the original creator; only updatedBy changes to whoever is submitting
+            if (livestockbreedEntity instanceof ObjectNode) {
+                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
+                if (existingCreatedBy != null) {
+                    ((ObjectNode) livestockbreedEntity).put("createdBy", existingCreatedBy);
+                }
+                ((ObjectNode) livestockbreedEntity).put("updatedBy", userContext.path("userId").asText(null));
+            }
             livestockbreedEntity1.setData(livestockbreedEntity);
             livestockbreedEntity1.setStatus(Constants.PENDING);
             livestockbreedEntity1.setUpdatedOn(currentTime);

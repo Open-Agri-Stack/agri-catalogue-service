@@ -122,3 +122,6 @@ LEARNING-PATH.md
 
 #===== pem files ====
 *.pem
+#===== postman =====
+# local collection is per-developer: own baseUrl, tokens and scratch requests
+postman/agri-catalogue-service.local.postman_collection.json
