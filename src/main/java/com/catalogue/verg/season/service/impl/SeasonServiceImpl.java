@@ -265,6 +265,7 @@ public class SeasonServiceImpl implements SeasonService {
             response.setMessage(Constants.ID_NOT_FOUND);
             return response;
         }
+        primaryKeyUtil.validateKey(Constants.SEASON_VALIDATION_FILE_JSON, id);
         JsonNode auditAfter = null;
         Timestamp auditCreatedOn = null;
         Timestamp auditUpdatedOn = null;
