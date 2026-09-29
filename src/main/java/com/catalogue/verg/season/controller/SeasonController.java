@@ -27,7 +27,7 @@ public class SeasonController {
 
     //@PostMapping("/v1/create")
     public ResponseEntity<CustomResponse> create(@RequestBody JsonNode seasonDetails) {
-        CustomResponse response = seasonService.createSeason(seasonDetails, null, "create", false);
+        CustomResponse response = seasonService.createSeason(seasonDetails, null, "create", false,null);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -47,7 +47,7 @@ public class SeasonController {
     public ResponseEntity<CustomResponse> add(
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestBody JsonNode seasonDetails) {
-        CustomResponse response = seasonService.createSeason(seasonDetails, token, "create", false);
+        CustomResponse response = seasonService.createSeason(seasonDetails, token, "create", false,null);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
