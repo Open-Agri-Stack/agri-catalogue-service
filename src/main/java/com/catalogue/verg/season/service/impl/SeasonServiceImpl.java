@@ -113,12 +113,14 @@ public class SeasonServiceImpl implements SeasonService {
     private long searchResultRedisTtl;
 
     @Override
-    public CustomResponse createSeason(JsonNode seasonEntity, String token) {
+    public CustomResponse createSeason(JsonNode seasonEntity, String token, JsonNode userContext) {
         log.info("SeasonServiceImpl::createSeason:entered the method: " + seasonEntity);
 
-        // Validate the caller's api token against the OAS auth service
-        JsonNode userContext = authValidationService.validateToken(token);
-        log.debug("SeasonServiceImpl::createSeason:token validated, user context: {}", userContext);
+        if (userContext == null) {
+            // Validate the caller's api token against the OAS auth service
+            userContext = authValidationService.validateToken(token);
+            log.debug("SeasonServiceImpl::createSeason:token validated, user context: {}", userContext);
+        }
 
         CustomResponse response = new CustomResponse();
         payloadValidation.validatePayload(Constants.SEASON_VALIDATION_FILE_JSON, seasonEntity);
@@ -469,7 +471,7 @@ public class SeasonServiceImpl implements SeasonService {
         CustomResponse response = importService.processBulkImport(
                 file,
                 Constants.SEASON_VALIDATION_FILE_JSON,
-                payload -> createSeason(payload, token)   // every row is created as the calling user
+                payload -> createSeason(payload, token, userContext)   // every row is created as the calling user
         );
 
         JsonNode importStats = objectMapper.valueToTree(response.getResult());
