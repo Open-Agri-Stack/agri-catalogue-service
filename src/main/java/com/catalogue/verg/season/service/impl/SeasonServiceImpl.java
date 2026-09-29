@@ -167,7 +167,8 @@ public class SeasonServiceImpl implements SeasonService {
                     seasonEntity1.getCreatedOn(), seasonEntity1.getUpdatedOn());
 
             // Lifecycle-disabled catalogues create ACTIVE records that are never reviewed
-            if (lifecyclePolicy.isEnabledFor(CATALOGUE_NAME)) {
+            if (lifecyclePolicy.isEnabledFor(CATALOGUE_NAME) && vergProperties.isNotificationEnabled()
+                    && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
             notificationUtil.sendNotification(
                      TEMPLATE_NAME,
                      TEMPLATE_CONSTANT,
@@ -619,6 +620,8 @@ public class SeasonServiceImpl implements SeasonService {
                     auditBefore, seasonEntity,
                     seasonEntity1.getCreatedOn(), seasonEntity1.getUpdatedOn());
 
+            if (vergProperties.isNotificationEnabled()
+                    && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
             notificationUtil.sendNotification(
                  TEMPLATE_NAME,
                  TEMPLATE_CONSTANT,
@@ -630,6 +633,7 @@ public class SeasonServiceImpl implements SeasonService {
                  ),
                  userContext.path("orgId").asText(null)
             );
+            }
             return response;
         } catch (Exception e) {
             throw new CustomException("error while processing", e.getMessage(),
@@ -790,6 +794,8 @@ public class SeasonServiceImpl implements SeasonService {
                     seasonEntity1.getData(), seasonEntity1.getData(),
                     seasonEntity1.getCreatedOn(), seasonEntity1.getUpdatedOn());
 
+            if (vergProperties.isNotificationEnabled()
+                    && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
              List<NotificationTemplate> templates = NotificationTemplateResolver.resolveDecisionTemplates(
                       operation,
                       targetStatus
@@ -807,6 +813,7 @@ public class SeasonServiceImpl implements SeasonService {
                 userContext.path("orgId").asText(null)
              );
              }
+            }
             return response;
         } catch (Exception e) {
             throw new CustomException("error while processing", e.getMessage(),
