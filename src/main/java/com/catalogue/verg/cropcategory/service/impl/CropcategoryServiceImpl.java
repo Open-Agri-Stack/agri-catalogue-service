@@ -2,7 +2,7 @@ package com.catalogue.verg.cropcategory.service.impl;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.datastax.oss.driver.api.core.uuid.Uuids;
+import com.catalogue.verg.core.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,15 +17,10 @@ import com.catalogue.verg.core.elasticsearch.dto.SearchCriteria;
 import com.catalogue.verg.core.elasticsearch.dto.SearchResult;
 import com.catalogue.verg.core.elasticsearch.service.ESUtilService;
 import com.catalogue.verg.core.exception.CustomException;
-import com.catalogue.verg.core.util.Constants;
-import com.catalogue.verg.core.util.LifecycleUtil;
-import com.catalogue.verg.core.util.PayloadValidation;
-import com.catalogue.verg.core.util.VergProperties;
 import com.catalogue.verg.core.service.AuditLogService;
 import com.catalogue.verg.core.service.AuthValidationService;
 import com.catalogue.verg.core.service.ImportService;
 import com.catalogue.verg.core.service.LoadFromPrimaryService;
-import com.catalogue.verg.core.util.PrimaryKeyUtil;
 import com.catalogue.verg.cropcategory.entity.CropcategoryEntity;
 import com.catalogue.verg.cropcategory.repository.CropcategoryRepository;
 import com.catalogue.verg.cropcategory.service.CropcategoryService;
@@ -41,7 +36,6 @@ import org.springframework.stereotype.Service;
 import com.catalogue.verg.core.constants.NotificationTemplate;
 import com.catalogue.verg.core.constants.NotificationTemplateConstants;
 import com.catalogue.verg.core.service.NotificationUtil;
-import com.catalogue.verg.core.util.NotificationTemplateResolver;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 
@@ -132,13 +125,11 @@ public class CropcategoryServiceImpl implements CropcategoryService {
             cropcategoryEntity1.setCropcategoryId(primaryID);
             // Stamp createdBy/updatedBy into the payload itself, before it's persisted as `data`
             if (cropcategoryEntity instanceof ObjectNode) {
-                String makerId = userContext.path("userId").asText(null);
-                ((ObjectNode) cropcategoryEntity).put("createdBy", makerId);
-                ((ObjectNode) cropcategoryEntity).put("updatedBy", makerId);
+                AuditStampUtil.stampCreate((ObjectNode) cropcategoryEntity, userContext);
             }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            
+
             String initialStatus = lifecyclePolicy.initialStatus(CATALOGUE_NAME);
             cropcategoryEntity1.setCreatedOn(currentTime);
             cropcategoryEntity1.setUpdatedOn(currentTime);
@@ -168,17 +159,17 @@ public class CropcategoryServiceImpl implements CropcategoryService {
 
             // Lifecycle-disabled catalogues create ACTIVE records that are never reviewed
             if (lifecyclePolicy.isEnabledFor(CATALOGUE_NAME)) {
-            notificationUtil.sendNotification(
-                     TEMPLATE_NAME,
-                     TEMPLATE_CONSTANT,
-                     NotificationTemplateConstants.NEW_RECORD_SUBMITTED_FOR_REVIEW,
-                     Map.of(
-                      "makerName", userContext.path("userName").asText(null),
-                      "submissionId", primaryID,
-                      "submissionDate", currentTime.toString()
+                notificationUtil.sendNotification(
+                        TEMPLATE_NAME,
+                        TEMPLATE_CONSTANT,
+                        NotificationTemplateConstants.NEW_RECORD_SUBMITTED_FOR_REVIEW,
+                        Map.of(
+                                "makerName", userContext.path("userName").asText(null),
+                                "submissionId", primaryID,
+                                "submissionDate", currentTime.toString()
                         ),
-                      userContext.path("orgId").asText(null)
-            );
+                        userContext.path("orgId").asText(null)
+                );
             }
 
             return response;
@@ -226,8 +217,8 @@ public class CropcategoryServiceImpl implements CropcategoryService {
             response.getResult().put(Constants.RESULT, searchResult);
             createSuccessResponse(response);
             redisTemplate.opsForValue()
-                                .set(generateRedisJwtTokenKey(searchCriteria), searchResult, searchResultRedisTtl,
-                                        TimeUnit.SECONDS);
+                    .set(generateRedisJwtTokenKey(searchCriteria), searchResult, searchResultRedisTtl,
+                            TimeUnit.SECONDS);
 
             auditLogService.logAudit(null, CATALOGUE_NAME,
                     userContext.path("userId").asText(null),
@@ -356,6 +347,9 @@ public class CropcategoryServiceImpl implements CropcategoryService {
 
             // Replace payload; preserve id / createdOn / status, bump updatedOn
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+            if (cropcategoryEntity instanceof ObjectNode) {
+                AuditStampUtil.carryOver((ObjectNode) cropcategoryEntity, cropcategoryEntity1.getData());
+            }
             cropcategoryEntity1.setData(cropcategoryEntity);
             cropcategoryEntity1.setUpdatedOn(currentTime);
             cropcategoryRepository.save(cropcategoryEntity1);
@@ -513,9 +507,7 @@ public class CropcategoryServiceImpl implements CropcategoryService {
             String primaryID = primaryKeyUtil.generateKey(Constants.CROPCATEGORY_VALIDATION_FILE_JSON);
             cropcategoryEntity1.setCropcategoryId(primaryID);
             if (cropcategoryEntity instanceof ObjectNode) {
-                String makerId = userContext.path("userId").asText(null);
-                ((ObjectNode) cropcategoryEntity).put("createdBy", makerId);
-                ((ObjectNode) cropcategoryEntity).put("updatedBy", makerId);
+                AuditStampUtil.stampCreate((ObjectNode) cropcategoryEntity, userContext);
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             cropcategoryEntity1.setCreatedOn(currentTime);
@@ -588,11 +580,7 @@ public class CropcategoryServiceImpl implements CropcategoryService {
             JsonNode auditBefore = cropcategoryEntity1.getData();
             // Preserve the original creator; only updatedBy changes to whoever is submitting
             if (cropcategoryEntity instanceof ObjectNode) {
-                String existingCreatedBy = (auditBefore != null) ? auditBefore.path("createdBy").asText(null) : null;
-                if (existingCreatedBy != null) {
-                    ((ObjectNode) cropcategoryEntity).put("createdBy", existingCreatedBy);
-                }
-                ((ObjectNode) cropcategoryEntity).put("updatedBy", userContext.path("userId").asText(null));
+                AuditStampUtil.stampResubmit((ObjectNode) cropcategoryEntity, auditBefore, userContext);
             }
             cropcategoryEntity1.setData(cropcategoryEntity);
             cropcategoryEntity1.setStatus(Constants.PENDING);
@@ -619,15 +607,15 @@ public class CropcategoryServiceImpl implements CropcategoryService {
                     cropcategoryEntity1.getCreatedOn(), cropcategoryEntity1.getUpdatedOn());
 
             notificationUtil.sendNotification(
-                 TEMPLATE_NAME,
-                 TEMPLATE_CONSTANT,
-                 NotificationTemplateConstants.NEW_RECORD_SUBMITTED_FOR_REVIEW,
-                 Map.of(
-                         "makerName", userContext.path("userName").asText(null),
-                         "submissionId", id,
-                         "submissionDate", currentTime.toString()
-                 ),
-                 userContext.path("orgId").asText(null)
+                    TEMPLATE_NAME,
+                    TEMPLATE_CONSTANT,
+                    NotificationTemplateConstants.NEW_RECORD_SUBMITTED_FOR_REVIEW,
+                    Map.of(
+                            "makerName", userContext.path("userName").asText(null),
+                            "submissionId", id,
+                            "submissionDate", currentTime.toString()
+                    ),
+                    userContext.path("orgId").asText(null)
             );
             return response;
         } catch (Exception e) {
@@ -765,6 +753,9 @@ public class CropcategoryServiceImpl implements CropcategoryService {
                 return response;
             }
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+            JsonNode dataBefore = cropcategoryEntity1.getData();
+            cropcategoryEntity1.setData(AuditStampUtil.stampDecision(
+                    dataBefore, operation, targetStatus, userContext, currentTime));
             cropcategoryEntity1.setStatus(targetStatus);
             cropcategoryEntity1.setUpdatedOn(currentTime);
             cropcategoryRepository.save(cropcategoryEntity1);
@@ -786,26 +777,26 @@ public class CropcategoryServiceImpl implements CropcategoryService {
                     userContext.path("userName").asText(null),
                     userContext.path("functionalRole").asText(null),
                     operation, targetStatus,
-                    cropcategoryEntity1.getData(), cropcategoryEntity1.getData(),
+                    dataBefore, cropcategoryEntity1.getData(),
                     cropcategoryEntity1.getCreatedOn(), cropcategoryEntity1.getUpdatedOn());
 
-             List<NotificationTemplate> templates = NotificationTemplateResolver.resolveDecisionTemplates(
-                      operation,
-                      targetStatus
-              );
-             for (NotificationTemplate template : templates) {
-              notificationUtil.sendNotification(
-                TEMPLATE_NAME,
-                TEMPLATE_CONSTANT,
-                template,
-                Map.of(
-                        "makerName", userContext.path("userName").asText(null),
-                        "submissionId", id,
-                        "actionDate", currentTime.toString()
-                ),
-                userContext.path("orgId").asText(null)
-             );
-             }
+            List<NotificationTemplate> templates = NotificationTemplateResolver.resolveDecisionTemplates(
+                    operation,
+                    targetStatus
+            );
+            for (NotificationTemplate template : templates) {
+                notificationUtil.sendNotification(
+                        TEMPLATE_NAME,
+                        TEMPLATE_CONSTANT,
+                        template,
+                        Map.of(
+                                "makerName", userContext.path("userName").asText(null),
+                                "submissionId", id,
+                                "actionDate", currentTime.toString()
+                        ),
+                        userContext.path("orgId").asText(null)
+                );
+            }
             return response;
         } catch (Exception e) {
             throw new CustomException("error while processing", e.getMessage(),

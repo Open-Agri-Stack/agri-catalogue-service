@@ -1,29 +1,62 @@
 {
-    "cropCategoryId": {
-        "type": "keyword"
-    },
-    "name": {
-        "type": "keyword"
-    },
-    "imageUrl": {
-        "type": "keyword"
-    },
-    "description": {
-        "type": "keyword"
-    },
-    "status": {
-        "type": "keyword"
-    },
-    "createdOn": {
-        "type": "date"
-    },
-    "updatedOn": {
-        "type": "date"
-    },
+  "cropCategoryId": {
+    "type": "keyword"
+  },
+  "name": {
+    "type": "keyword"
+  },
+  "imageUrl": {
+    "type": "keyword"
+  },
+  "description": {
+    "type": "keyword"
+  },
+  "status": {
+    "type": "keyword"
+  },
+  "createdOn": {
+    "type": "date"
+  },
+  "updatedOn": {
+    "type": "date"
+  },
   "createdBy": {
     "type": "keyword"
   },
   "updatedBy": {
     "type": "keyword"
+  },
+  "createdByName": {
+    "type": "keyword"
+  },
+  "updatedByName": {
+    "type": "keyword"
+  },
+  "approvedBy": {
+    "type": "keyword"
+  },
+  "approvedByName": {
+    "type": "keyword"
+  },
+  "approvedOn": {
+    "type": "date"
+  },
+  "reviewedBy": {
+    "type": "keyword"
+  },
+  "reviewedByName": {
+    "type": "keyword"
+  },
+  "reviewedOn": {
+    "type": "date"
+  },
+  "rejectedBy": {
+    "type": "keyword"
+  },
+  "rejectedByName": {
+    "type": "keyword"
+  },
+  "rejectedOn": {
+    "type": "date"
   }
 }
