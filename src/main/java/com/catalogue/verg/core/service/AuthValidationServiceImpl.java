@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.catalogue.verg.core.exception.CustomException;
 import com.catalogue.verg.core.util.Constants;
+import com.catalogue.verg.core.util.VergProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -32,6 +33,7 @@ public class AuthValidationServiceImpl implements AuthValidationService {
 
         private final RestTemplate restTemplate;
         private final ObjectMapper objectMapper;
+        private final VergProperties vergProperties;
 
         @Value("${oas.auth.validate-url}")
         private String authValidateUrl;
@@ -41,13 +43,22 @@ public class AuthValidationServiceImpl implements AuthValidationService {
 
         public AuthValidationServiceImpl(
                         RestTemplate restTemplate,
-                        ObjectMapper objectMapper) {
+                        ObjectMapper objectMapper,
+                        VergProperties vergProperties) {
                 this.restTemplate = restTemplate;
                 this.objectMapper = objectMapper;
+                this.vergProperties = vergProperties;
         }
 
         @Override
         public JsonNode validateToken(String authorizationHeader, boolean jwtRequired) {
+
+                // Switch off: never call OAS, whether or not a token was sent
+                if (!vergProperties.isAuthValidationEnabled()) {
+                        log.debug("AuthValidationService::validateToken::auth validation disabled, "
+                                        + "continuing as {}", ANONYMOUS_USER);
+                        return anonymousContext();
+                }
 
                 if (authorizationHeader == null || authorizationHeader.isBlank()) {
                         // Open endpoint: no token supplied, so the caller is the anonymous public user

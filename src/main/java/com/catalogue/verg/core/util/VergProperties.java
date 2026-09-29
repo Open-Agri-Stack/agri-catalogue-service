@@ -18,11 +18,11 @@ public class VergProperties {
         @Value("${search.string.max.regex.length}")
         private int searchStringMaxRegexLength;
 
-        @Value("${catalogue.audit.enabled:true}")
-        private boolean auditEnabled;
-
         @Value("${catalogue.notification.enabled:true}")
         private boolean notificationEnabled;
+
+        @Value("${catalogue.auth.validation.enabled:true}")
+        private boolean authValidationEnabled;
 
         @Value("${elastic.required.field.audit.json.path}")
         private String elasticAuditJsonPath;
