@@ -122,12 +122,14 @@ public class SeasonServiceImpl implements SeasonService {
     private long searchResultRedisTtl;
 
     @Override
-    public CustomResponse createSeason(JsonNode seasonEntity, String token, String operation, Boolean isPreviewRequired) {
+    public CustomResponse createSeason(JsonNode seasonEntity, String token, String operation, Boolean isPreviewRequired, JsonNode userContext) {
         log.info("SeasonServiceImpl::createSeason:entered the method: " + seasonEntity);
 
-        // Validate the caller's api token against the OAS auth service
-        JsonNode userContext = authValidationService.validateToken(token);
-        log.debug("SeasonServiceImpl::createSeason:token validated, user context: {}", userContext);
+        if (userContext == null) {
+            // Validate the caller's api token against the OAS auth service
+            userContext = authValidationService.validateToken(token);
+            log.debug("SeasonServiceImpl::createSeason:token validated, user context: {}", userContext);
+        }
 
         CustomResponse response = new CustomResponse();
         payloadValidation.validatePayload(Constants.SEASON_VALIDATION_FILE_JSON, seasonEntity);
@@ -180,9 +182,9 @@ public class SeasonServiceImpl implements SeasonService {
                     objectMapper.createObjectNode(), seasonEntity,
                     seasonEntity1.getCreatedOn(), seasonEntity1.getUpdatedOn());
 
-            // Lifecycle-disabled catalogues create ACTIVE records that are never reviewed,
-            // and a preview create is not a real submission either
-            if (lifecyclePolicy.isEnabledFor(CATALOGUE_NAME) && !Boolean.TRUE.equals(isPreviewRequired)) {
+            // Lifecycle-disabled catalogues create ACTIVE records that are never reviewed
+            if (lifecyclePolicy.isEnabledFor(CATALOGUE_NAME) && !Boolean.TRUE.equals(isPreviewRequired) && vergProperties.isNotificationEnabled()
+                    && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
             notificationUtil.sendNotification(
                      TEMPLATE_NAME,
                      TEMPLATE_CONSTANT,
@@ -280,6 +282,7 @@ public class SeasonServiceImpl implements SeasonService {
             response.setMessage(Constants.ID_NOT_FOUND);
             return response;
         }
+        primaryKeyUtil.validateKey(Constants.SEASON_VALIDATION_FILE_JSON, id);
         JsonNode auditAfter = null;
         Timestamp auditCreatedOn = null;
         Timestamp auditUpdatedOn = null;
@@ -482,7 +485,7 @@ public class SeasonServiceImpl implements SeasonService {
         CustomResponse response = importService.processBulkImport(
                 file,
                 Constants.SEASON_VALIDATION_FILE_JSON,
-                payload -> createSeason(payload, token, "import", false)   // every row is created as the calling user
+                payload -> createSeason(payload, token, "import", false, userContext)   // every row is created as the calling user
         );
 
         JsonNode importStats = objectMapper.valueToTree(response.getResult());
@@ -850,6 +853,8 @@ public class SeasonServiceImpl implements SeasonService {
                     auditBefore, seasonEntity,
                     seasonEntity1.getCreatedOn(), seasonEntity1.getUpdatedOn());
 
+            if (vergProperties.isNotificationEnabled()
+                    && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
             notificationUtil.sendNotification(
                  TEMPLATE_NAME,
                  TEMPLATE_CONSTANT,
@@ -861,6 +866,7 @@ public class SeasonServiceImpl implements SeasonService {
                  ),
                  userContext.path("orgId").asText(null)
             );
+            }
             return response;
         } catch (Exception e) {
             throw new CustomException("error while processing", e.getMessage(),
@@ -1021,6 +1027,8 @@ public class SeasonServiceImpl implements SeasonService {
                     seasonEntity1.getData(), seasonEntity1.getData(),
                     seasonEntity1.getCreatedOn(), seasonEntity1.getUpdatedOn());
 
+            if (vergProperties.isNotificationEnabled()
+                    && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
              List<NotificationTemplate> templates = NotificationTemplateResolver.resolveDecisionTemplates(
                       operation,
                       targetStatus
@@ -1038,6 +1046,7 @@ public class SeasonServiceImpl implements SeasonService {
                 userContext.path("orgId").asText(null)
              );
              }
+            }
             return response;
         } catch (Exception e) {
             throw new CustomException("error while processing", e.getMessage(),
@@ -1074,7 +1083,7 @@ public class SeasonServiceImpl implements SeasonService {
     public String generateRedisJwtTokenKey(Object requestPayload) {
         if (requestPayload != null) {
             try {
-                String reqJsonString = objectMapper.writeValueAsString(requestPayload);
+                String reqJsonString = objectMapper.writeValueAsString(requestPayload)+CATALOGUE_NAME;
                 return JWT.create()
                         .withClaim(Constants.REQUEST_PAYLOAD, reqJsonString)
                         .sign(Algorithm.HMAC256(Constants.JWT_SECRET_KEY));

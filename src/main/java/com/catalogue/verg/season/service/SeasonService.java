@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface SeasonService {
 
     // token: the raw Authorization header from the caller
-    CustomResponse createSeason(JsonNode seasonEntity, String token, String operation, Boolean isPreviewRequired);
+    CustomResponse createSeason(JsonNode seasonEntity, String token, String operation, Boolean isPreviewRequired,JsonNode userContext);
 
     CustomResponse updateSeason(String id, JsonNode seasonEntity);
 

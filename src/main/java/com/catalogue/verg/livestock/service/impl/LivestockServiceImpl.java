@@ -842,7 +842,7 @@ public class LivestockServiceImpl implements LivestockService {
     public String generateRedisJwtTokenKey(Object requestPayload) {
         if (requestPayload != null) {
             try {
-                String reqJsonString = objectMapper.writeValueAsString(requestPayload);
+                String reqJsonString = objectMapper.writeValueAsString(requestPayload)+CATALOGUE_NAME;
                 return JWT.create()
                         .withClaim(Constants.REQUEST_PAYLOAD, reqJsonString)
                         .sign(Algorithm.HMAC256(Constants.JWT_SECRET_KEY));
