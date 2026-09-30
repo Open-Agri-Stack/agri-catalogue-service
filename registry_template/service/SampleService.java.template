@@ -3,6 +3,7 @@ package com.catalogue.verg.{{service_name_lower}}.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.catalogue.verg.core.dto.CustomResponse;
 import com.catalogue.verg.core.dto.LifecycleRequest;
+import com.catalogue.verg.core.dto.PreviewDecisionRequest;
 import com.catalogue.verg.core.elasticsearch.dto.SearchCriteria;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface {{service_name_pascal}}Service {
 
     // token: the raw Authorization header from the caller
-    CustomResponse create{{service_name_pascal}}(JsonNode {{service_name_camel}}Entity, String token);
+    CustomResponse create{{service_name_pascal}}(JsonNode {{service_name_camel}}Entity, String token, String operation, Boolean isPreviewRequired, JsonNode userContext);
 
     CustomResponse update{{service_name_pascal}}(String id, JsonNode {{service_name_camel}}Entity);
 
@@ -38,6 +39,10 @@ public interface {{service_name_pascal}}Service {
     CustomResponse delete(String id, String token);
 
     CustomResponse importData(MultipartFile file, String token);
+
+    CustomResponse importDataWithPreview(MultipartFile file, String token);
+
+    CustomResponse decidePreview(PreviewDecisionRequest request, String token);
 
     // Drops the ES index and rebuilds it from the primary store (Postgres); skips DELETED records
     CustomResponse loadFromPrimary{{service_name_pascal}}();

@@ -12,6 +12,7 @@ import com.catalogue.verg.core.cache.CacheService;
 import com.catalogue.verg.core.config.LifecyclePolicy;
 import com.catalogue.verg.core.dto.CustomResponse;
 import com.catalogue.verg.core.dto.LifecycleRequest;
+import com.catalogue.verg.core.dto.PreviewDecisionRequest;
 import com.catalogue.verg.core.dto.RespParam;
 import com.catalogue.verg.core.elasticsearch.dto.SearchCriteria;
 import com.catalogue.verg.core.elasticsearch.dto.SearchResult;
@@ -45,8 +46,13 @@ import com.catalogue.verg.core.util.NotificationTemplateResolver;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -107,18 +113,23 @@ public class FertilizerServiceImpl implements FertilizerService {
     private static final String TEMPLATE_NAME = "Fertilizer";
     private static final String TEMPLATE_CONSTANT = "FERTILIZER";
 
+
+//    private static final int MAX_PREVIEW_BATCH = 500;
+
     private Logger logger = LoggerFactory.getLogger(FertilizerServiceImpl.class);
 
     @Value("${spring.redis.cacheTtl}")
     private long searchResultRedisTtl;
 
     @Override
-    public CustomResponse createFertilizer(JsonNode fertilizerEntity, String token) {
+    public CustomResponse createFertilizer(JsonNode fertilizerEntity, String token, String operation, Boolean isPreviewRequired, JsonNode userContext) {
         log.info("FertilizerServiceImpl::createFertilizer:entered the method: " + fertilizerEntity);
 
-        // Validate the caller's api token against the OAS auth service
-        JsonNode userContext = authValidationService.validateToken(token);
-        log.debug("FertilizerServiceImpl::createFertilizer:token validated, user context: {}", userContext);
+        if (userContext == null) {
+            // Validate the caller's api token against the OAS auth service
+            userContext = authValidationService.validateToken(token);
+            log.debug("FertilizerServiceImpl::createFertilizer:token validated, user context: {}", userContext);
+        }
 
         CustomResponse response = new CustomResponse();
         payloadValidation.validatePayload(Constants.FERTILIZER_VALIDATION_FILE_JSON, fertilizerEntity);
@@ -139,7 +150,12 @@ public class FertilizerServiceImpl implements FertilizerService {
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
-            String initialStatus = lifecyclePolicy.initialStatus(CATALOGUE_NAME);
+            String initialStatus;
+            if (Boolean.TRUE.equals(isPreviewRequired)) {
+                initialStatus = Constants.PREVIEW;
+            } else {
+                initialStatus = lifecyclePolicy.initialStatus(CATALOGUE_NAME);
+            }
             fertilizerEntity1.setCreatedOn(currentTime);
             fertilizerEntity1.setUpdatedOn(currentTime);
             fertilizerEntity1.setStatus(initialStatus);
@@ -162,12 +178,13 @@ public class FertilizerServiceImpl implements FertilizerService {
                     userContext.path("userId").asText(null),
                     userContext.path("userName").asText(null),
                     userContext.path("functionalRole").asText(null),
-                    "create", initialStatus,
+                    operation, initialStatus,
                     objectMapper.createObjectNode(), fertilizerEntity,
                     fertilizerEntity1.getCreatedOn(), fertilizerEntity1.getUpdatedOn());
 
             // Lifecycle-disabled catalogues create ACTIVE records that are never reviewed
-            if (lifecyclePolicy.isEnabledFor(CATALOGUE_NAME)) {
+            if (lifecyclePolicy.isEnabledFor(CATALOGUE_NAME) && !Boolean.TRUE.equals(isPreviewRequired) && vergProperties.isNotificationEnabled()
+                    && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
             notificationUtil.sendNotification(
                      TEMPLATE_NAME,
                      TEMPLATE_CONSTANT,
@@ -265,6 +282,7 @@ public class FertilizerServiceImpl implements FertilizerService {
             response.setMessage(Constants.ID_NOT_FOUND);
             return response;
         }
+        primaryKeyUtil.validateKey(Constants.FERTILIZER_VALIDATION_FILE_JSON, id);
         JsonNode auditAfter = null;
         Timestamp auditCreatedOn = null;
         Timestamp auditUpdatedOn = null;
@@ -467,7 +485,7 @@ public class FertilizerServiceImpl implements FertilizerService {
         CustomResponse response = importService.processBulkImport(
                 file,
                 Constants.FERTILIZER_VALIDATION_FILE_JSON,
-                payload -> createFertilizer(payload, token)   // every row is created as the calling user
+                payload -> createFertilizer(payload, token, "import", false, userContext)   // every row is created as the calling user
         );
 
         JsonNode importStats = objectMapper.valueToTree(response.getResult());
@@ -478,6 +496,225 @@ public class FertilizerServiceImpl implements FertilizerService {
                 "import", null, null, importStats, null, null);
 
         return response;
+    }
+
+    @Override
+    public CustomResponse importDataWithPreview(MultipartFile file, String token) {
+        log.info("FertilizerServiceImpl :: importDataWithPreview :: started");
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("FertilizerServiceImpl :: importDataWithPreview : token validated, user context: {}", userContext);
+
+        CustomResponse response = importService.processBulkImport(
+                file,
+                Constants.FERTILIZER_VALIDATION_FILE_JSON,
+                payload -> createFertilizer(payload, token, "import", true, userContext)   // every row is created as the calling user
+        );
+
+        JsonNode importStats = objectMapper.valueToTree(response.getResult());
+        auditLogService.logAudit(null, CATALOGUE_NAME,
+                userContext.path("userId").asText(null),
+                userContext.path("userName").asText(null),
+                userContext.path("functionalRole").asText(null),
+                "importDataWithPreview", null, null, importStats, null, null);
+
+        return response;
+    }
+
+    @Override
+    public CustomResponse decidePreview(PreviewDecisionRequest request, String token) {
+        log.info("FertilizerServiceImpl::decidePreview:entered the method");
+
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("FertilizerServiceImpl::decidePreview:token validated, user context: {}", userContext);
+
+        CustomResponse response = new CustomResponse();
+
+        // Matched case-insensitively, in the same trim-and-fold style as LifecycleUtil.normalizeTarget
+        String decision = request == null || request.getDecision() == null
+                ? null
+                : request.getDecision().trim().toLowerCase(Locale.ROOT);
+        boolean confirm = Constants.CONFIRM.equals(decision);
+        if (!confirm && !Constants.DISCARD.equals(decision)) {
+            log.warn("FertilizerServiceImpl::decidePreview:invalid decision '{}'",
+                    request == null ? null : request.getDecision());
+            response.setResponseCode(HttpStatus.BAD_REQUEST);
+            response.setMessage(Constants.INVALID_DECISION);
+            return response;
+        }
+
+        // De-duplicate up front: a repeated id would otherwise be processed twice, and the second pass
+        // would report a spurious failure because the record is no longer PREVIEW.
+        Set<String> ids = new LinkedHashSet<>();
+        if (request.getIds() != null) {
+            for (String requestedId : request.getIds()) {
+                if (StringUtils.isNotBlank(requestedId)) {
+                    ids.add(requestedId.trim());
+                }
+            }
+        }
+        if (ids.isEmpty()) {
+            log.warn("FertilizerServiceImpl::decidePreview:no usable ids in the request");
+            response.setResponseCode(HttpStatus.BAD_REQUEST);
+            response.setMessage(Constants.ID_NOT_FOUND);
+            return response;
+        }
+//        if (ids.size() > MAX_PREVIEW_BATCH) {
+//            log.warn("FertilizerServiceImpl::decidePreview:batch of {} exceeds the limit of {}",
+//                    ids.size(), MAX_PREVIEW_BATCH);
+//            throw new CustomException(Constants.ERROR,
+//                    "A maximum of " + MAX_PREVIEW_BATCH + " ids can be decided in one request",
+//                    HttpStatus.BAD_REQUEST);
+//        }
+
+
+        String targetStatus = confirm ? lifecyclePolicy.initialStatus(CATALOGUE_NAME) : Constants.DELETED;
+        String operation = confirm ? "confirmPreview" : "discardPreview";
+
+        List<Map<String, Object>> successRecords = new ArrayList<>();
+        List<Map<String, Object>> failureRecords = new ArrayList<>();
+        List<String> confirmedIds = new ArrayList<>();
+
+        // One lookup for the whole batch rather than a findById per id
+        Map<String, FertilizerEntity> foundById = new HashMap<>();
+        for (FertilizerEntity found : fertilizerRepository.findAllById(ids)) {
+            foundById.put(found.getFertilizerId(), found);
+        }
+
+        for (String id : ids) {
+            try {
+                FertilizerEntity fertilizerEntity1 = foundById.get(id);
+                if (fertilizerEntity1 == null) {
+                    log.warn("FertilizerServiceImpl::decidePreview:no record found for id: {}", id);
+                    failureRecords.add(buildFailureRecord(id, Constants.INVALID_ID));
+                    continue;
+                }
+
+                if (!Constants.PREVIEW.equals(fertilizerEntity1.getStatus())) {
+                    log.warn("FertilizerServiceImpl::decidePreview:record {} is {}, requires {}",
+                            id, fertilizerEntity1.getStatus(), Constants.PREVIEW);
+                    failureRecords.add(buildFailureRecord(id, Constants.INVALID_STATUS_TRANSITION));
+                    continue;
+                }
+
+                if (confirm) {
+                    applyPreviewConfirm(fertilizerEntity1, targetStatus, userContext, operation);
+                    confirmedIds.add(id);
+                } else {
+                    applyPreviewDiscard(fertilizerEntity1, userContext, operation);
+                }
+
+                Map<String, Object> successRecord = new HashMap<>();
+                successRecord.put(Constants.ID, id);
+                successRecord.put(Constants.STATUS, targetStatus);
+                successRecords.add(successRecord);
+                log.info("FertilizerServiceImpl::decidePreview:record {} moved {} -> {}",
+                        id, Constants.PREVIEW, targetStatus);
+
+            } catch (Exception e) {
+                log.error("FertilizerServiceImpl::decidePreview:error while processing id: {}", id, e);
+                failureRecords.add(buildFailureRecord(id, "Unexpected error: " + e.getMessage()));
+            }
+        }
+
+
+        if (confirm && !confirmedIds.isEmpty() && lifecyclePolicy.isEnabledFor(CATALOGUE_NAME)
+                && vergProperties.isNotificationEnabled()
+                && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
+            notificationUtil.sendNotification(
+                    TEMPLATE_NAME,
+                    TEMPLATE_CONSTANT,
+                    NotificationTemplateConstants.NEW_RECORD_SUBMITTED_FOR_REVIEW,
+                    Map.of(
+                            "makerName", userContext.path("userName").asText(""),
+                            "submissionId", String.join(", ", confirmedIds),
+                            "submissionDate", new Timestamp(System.currentTimeMillis()).toString()
+                    ),
+                    userContext.path("orgId").asText("")
+            );
+        }
+
+        response.getResult().put("decision", decision);
+        response.getResult().put("totalIds", ids.size());
+        response.getResult().put("successCount", successRecords.size());
+        response.getResult().put("failureCount", failureRecords.size());
+        response.getResult().put("successRecords", successRecords);
+        response.getResult().put("failureRecords", failureRecords);
+
+        if (failureRecords.isEmpty()) {
+            response.setResponseCode(HttpStatus.OK);
+            response.setMessage("Preview " + decision + " completed");
+        } else if (successRecords.isEmpty()) {
+            response.setResponseCode(HttpStatus.BAD_REQUEST);
+            response.setMessage("Preview " + decision + " failed - all ids had errors");
+        } else {
+            response.setResponseCode(HttpStatus.OK);
+            response.setMessage("Preview " + decision + " completed with some errors");
+        }
+
+        // Batch-level audit row alongside the per-id ones, mirroring importData
+        auditLogService.logAudit(null, CATALOGUE_NAME,
+                userContext.path("userId").asText(null),
+                userContext.path("userName").asText(null),
+                userContext.path("functionalRole").asText(null),
+                operation, null, null,
+                objectMapper.valueToTree(response.getResult()), null, null);
+
+        log.info("FertilizerServiceImpl::decidePreview:{} completed. Total: {}, Success: {}, Failures: {}",
+                decision, ids.size(), successRecords.size(), failureRecords.size());
+        return response;
+    }
+
+
+    private void applyPreviewConfirm(FertilizerEntity fertilizerEntity1, String targetStatus, JsonNode userContext,
+                                     String operation) throws IOException {
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        fertilizerEntity1.setStatus(targetStatus);
+        fertilizerEntity1.setUpdatedOn(currentTime);
+        fertilizerRepository.save(fertilizerEntity1);
+
+        ObjectNode jsonNode = buildDocument(fertilizerEntity1.getData(), targetStatus,
+                fertilizerEntity1.getCreatedOn(), currentTime);
+        Map<String, Object> map = objectMapper.convertValue(jsonNode, Map.class);
+        esUtilService.updateDocument(Constants.FERTILIZER_INDEX_NAME, Constants.INDEX_TYPE,
+                fertilizerEntity1.getFertilizerId(), map, vergProperties.getElasticFertilizerJsonPath());
+        cacheService.putCache(fertilizerEntity1.getFertilizerId(), jsonNode);
+
+        auditLogService.logAudit(fertilizerEntity1.getFertilizerId(), CATALOGUE_NAME,
+                userContext.path("userId").asText(null),
+                userContext.path("userName").asText(null),
+                userContext.path("functionalRole").asText(null),
+                operation, targetStatus,
+                fertilizerEntity1.getData(), fertilizerEntity1.getData(),
+                fertilizerEntity1.getCreatedOn(), fertilizerEntity1.getUpdatedOn());
+    }
+
+
+    private void applyPreviewDiscard(FertilizerEntity fertilizerEntity1, JsonNode userContext, String operation)
+            throws IOException {
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        fertilizerEntity1.setStatus(Constants.DELETED);
+        fertilizerEntity1.setUpdatedOn(currentTime);
+        fertilizerRepository.save(fertilizerEntity1);
+
+        esUtilService.deleteDocument(fertilizerEntity1.getFertilizerId(), Constants.FERTILIZER_INDEX_NAME);
+        cacheService.deleteCache(fertilizerEntity1.getFertilizerId());
+
+        auditLogService.logAudit(fertilizerEntity1.getFertilizerId(), CATALOGUE_NAME,
+                userContext.path("userId").asText(null),
+                userContext.path("userName").asText(null),
+                userContext.path("functionalRole").asText(null),
+                operation, Constants.DELETED,
+                fertilizerEntity1.getData(), fertilizerEntity1.getData(),
+                fertilizerEntity1.getCreatedOn(), fertilizerEntity1.getUpdatedOn());
+    }
+
+    private Map<String, Object> buildFailureRecord(String id, String error) {
+        Map<String, Object> failureRecord = new HashMap<>();
+        failureRecord.put(Constants.ID, id);
+        failureRecord.put("errors", error);
+        return failureRecord;
     }
 
     @Override
@@ -618,6 +855,8 @@ public class FertilizerServiceImpl implements FertilizerService {
                     auditBefore, fertilizerEntity,
                     fertilizerEntity1.getCreatedOn(), fertilizerEntity1.getUpdatedOn());
 
+            if (vergProperties.isNotificationEnabled()
+                    && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
             notificationUtil.sendNotification(
                  TEMPLATE_NAME,
                  TEMPLATE_CONSTANT,
@@ -629,6 +868,7 @@ public class FertilizerServiceImpl implements FertilizerService {
                  ),
                  userContext.path("orgId").asText(null)
             );
+            }
             return response;
         } catch (Exception e) {
             throw new CustomException("error while processing", e.getMessage(),
@@ -789,6 +1029,8 @@ public class FertilizerServiceImpl implements FertilizerService {
                     fertilizerEntity1.getData(), fertilizerEntity1.getData(),
                     fertilizerEntity1.getCreatedOn(), fertilizerEntity1.getUpdatedOn());
 
+            if (vergProperties.isNotificationEnabled()
+                    && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
              List<NotificationTemplate> templates = NotificationTemplateResolver.resolveDecisionTemplates(
                       operation,
                       targetStatus
@@ -806,6 +1048,7 @@ public class FertilizerServiceImpl implements FertilizerService {
                 userContext.path("orgId").asText(null)
              );
              }
+            }
             return response;
         } catch (Exception e) {
             throw new CustomException("error while processing", e.getMessage(),
