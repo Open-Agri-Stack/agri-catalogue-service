@@ -509,7 +509,7 @@ public class SeasonServiceImpl implements SeasonService {
         CustomResponse response = importService.processBulkImport(
                 file,
                 Constants.SEASON_VALIDATION_FILE_JSON,
-                payload -> createSeason(payload, token, "import", true)   // every row is created as the calling user
+                payload -> createSeason(payload, token, "import", true, userContext)   // every row is created as the calling user
         );
 
         JsonNode importStats = objectMapper.valueToTree(response.getResult());
@@ -619,7 +619,9 @@ public class SeasonServiceImpl implements SeasonService {
         }
 
 
-        if (confirm && !confirmedIds.isEmpty() && lifecyclePolicy.isEnabledFor(CATALOGUE_NAME)) {
+        if (confirm && !confirmedIds.isEmpty() && lifecyclePolicy.isEnabledFor(CATALOGUE_NAME)
+                && vergProperties.isNotificationEnabled()
+                && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
             notificationUtil.sendNotification(
                     TEMPLATE_NAME,
                     TEMPLATE_CONSTANT,
