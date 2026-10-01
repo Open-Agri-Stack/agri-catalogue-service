@@ -108,6 +108,45 @@
       }
      },
      "response": []
+    },
+    {
+     "name": "loadFromPrimary",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [],
+      "url": {
+       "raw": "{{baseUrl}}/audit/v1/loadFromPrimary",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "audit",
+        "v1",
+        "loadFromPrimary"
+       ]
+      }
+     },
+     "response": []
     }
    ]
   },
@@ -775,6 +814,151 @@
       }
      },
      "response": []
+    },
+    {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly.",
+         "src": "postman-cloud:///1f184316-af06-4780-ad77-16b755ea313a"
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/cropcategory/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "cropcategory",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{cropcategoryPreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.cropcategoryId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('cropcategoryPreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{cropcategoryPreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/cropcategory/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "cropcategory",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('cropcategoryPreviewIds')) {",
+         "    pm.collectionVariables.set('cropcategoryPreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
     },
     {
      "name": "loadFromPrimary",
@@ -1483,6 +1667,151 @@
      "response": []
     },
     {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly.",
+         "src": "postman-cloud:///1f184319-0ff9-4950-85b2-9e3bc51cebfe"
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/croptype/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "croptype",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{croptypePreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.croptypeId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('croptypePreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{croptypePreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/croptype/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "croptype",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('croptypePreviewIds')) {",
+         "    pm.collectionVariables.set('croptypePreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
+    },
+    {
      "name": "loadFromPrimary",
      "request": {
       "auth": {
@@ -2187,6 +2516,151 @@
       }
      },
      "response": []
+    },
+    {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly.",
+         "src": "postman-cloud:///1f184323-a9df-4e20-8092-c515640ac223"
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/cropvariety/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "cropvariety",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{cropvarietyPreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.cropvarietyId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('cropvarietyPreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{cropvarietyPreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/cropvariety/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "cropvariety",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('cropvarietyPreviewIds')) {",
+         "    pm.collectionVariables.set('cropvarietyPreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
     },
     {
      "name": "loadFromPrimary",
@@ -2895,6 +3369,151 @@
      "response": []
     },
     {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly.",
+         "value": ""
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/extensionequipment/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "extensionequipment",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{extensionequipmentPreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.extensionequipmentId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('extensionequipmentPreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{extensionequipmentPreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/extensionequipment/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "extensionequipment",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('extensionequipmentPreviewIds')) {",
+         "    pm.collectionVariables.set('extensionequipmentPreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
+    },
+    {
      "name": "loadFromPrimary",
      "request": {
       "auth": {
@@ -3599,6 +4218,151 @@
       }
      },
      "response": []
+    },
+    {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly.",
+         "value": ""
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/fertilizer/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "fertilizer",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{fertilizerPreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.fertilizerId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('fertilizerPreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{fertilizerPreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/fertilizer/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "fertilizer",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('fertilizerPreviewIds')) {",
+         "    pm.collectionVariables.set('fertilizerPreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
     },
     {
      "name": "loadFromPrimary",
@@ -4307,6 +5071,151 @@
      "response": []
     },
     {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly.",
+         "value": ""
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/insecticide/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "insecticide",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{insecticidePreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.insecticideId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('insecticidePreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{insecticidePreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/insecticide/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "insecticide",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('insecticidePreviewIds')) {",
+         "    pm.collectionVariables.set('insecticidePreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
+    },
+    {
      "name": "loadFromPrimary",
      "request": {
       "auth": {
@@ -5011,6 +5920,151 @@
       }
      },
      "response": []
+    },
+    {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly.",
+         "src": "postman-cloud:///1f184327-490b-4d70-b6cf-dab404af707a"
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/livestock/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "livestock",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{livestockPreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.livestockId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('livestockPreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{livestockPreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/livestock/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "livestock",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('livestockPreviewIds')) {",
+         "    pm.collectionVariables.set('livestockPreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
     },
     {
      "name": "loadFromPrimary",
@@ -5718,6 +6772,150 @@
      "response": []
     },
     {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly."
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/livestockbreed/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "livestockbreed",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{livestockbreedPreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.livestockbreedId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('livestockbreedPreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{livestockbreedPreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/livestockbreed/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "livestockbreed",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('livestockbreedPreviewIds')) {",
+         "    pm.collectionVariables.set('livestockbreedPreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
+    },
+    {
      "name": "loadFromPrimary",
      "request": {
       "auth": {
@@ -6423,6 +7621,150 @@
      "response": []
     },
     {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly."
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/livestockcategory/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "livestockcategory",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{livestockcategoryPreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.livestockcategoryId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('livestockcategoryPreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{livestockcategoryPreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/livestockcategory/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "livestockcategory",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('livestockcategoryPreviewIds')) {",
+         "    pm.collectionVariables.set('livestockcategoryPreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
+    },
+    {
      "name": "loadFromPrimary",
      "request": {
       "auth": {
@@ -7126,6 +8468,150 @@
       }
      },
      "response": []
+    },
+    {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly."
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/locationconfig/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "locationconfig",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{locationconfigPreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.locationconfigId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('locationconfigPreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{locationconfigPreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/locationconfig/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "locationconfig",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('locationconfigPreviewIds')) {",
+         "    pm.collectionVariables.set('locationconfigPreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
     },
     {
      "name": "loadFromPrimary",
@@ -7834,6 +9320,151 @@
      "response": []
     },
     {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly.",
+         "value": ""
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/locationmapper/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "locationmapper",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{locationmapperPreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.locationmapperId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('locationmapperPreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{locationmapperPreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/locationmapper/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "locationmapper",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('locationmapperPreviewIds')) {",
+         "    pm.collectionVariables.set('locationmapperPreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
+    },
+    {
      "name": "loadFromPrimary",
      "request": {
       "auth": {
@@ -8538,6 +10169,151 @@
       }
      },
      "response": []
+    },
+    {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly.",
+         "value": ""
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/locationobject/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "locationobject",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{locationobjectPreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.locationobjectId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('locationobjectPreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{locationobjectPreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/locationobject/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "locationobject",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('locationobjectPreviewIds')) {",
+         "    pm.collectionVariables.set('locationobjectPreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
     },
     {
      "name": "loadFromPrimary",
@@ -9246,6 +11022,151 @@
      "response": []
     },
     {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly.",
+         "src": ""
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/marketplace/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "marketplace",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{marketplacePreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.marketplaceId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('marketplacePreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{marketplacePreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/marketplace/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "marketplace",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('marketplacePreviewIds')) {",
+         "    pm.collectionVariables.set('marketplacePreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
+    },
+    {
      "name": "loadFromPrimary",
      "request": {
       "auth": {
@@ -9950,6 +11871,151 @@
       }
      },
      "response": []
+    },
+    {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly.",
+         "value": ""
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/pesticide/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "pesticide",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{pesticidePreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.pesticideId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('pesticidePreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{pesticidePreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/pesticide/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "pesticide",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('pesticidePreviewIds')) {",
+         "    pm.collectionVariables.set('pesticidePreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
     },
     {
      "name": "loadFromPrimary",
@@ -10658,6 +12724,151 @@
      "response": []
     },
     {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly.",
+         "src": "postman-cloud:///1f18432a-7897-4230-a96e-f3f1653098c5"
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/season/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "season",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{seasonPreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.seasonId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('seasonPreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{seasonPreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/season/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "season",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('seasonPreviewIds')) {",
+         "    pm.collectionVariables.set('seasonPreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
+    },
+    {
      "name": "loadFromPrimary",
      "request": {
       "auth": {
@@ -11364,6 +13575,151 @@
      "response": []
     },
     {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly.",
+         "value": ""
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/seed/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "seed",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{seedPreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.seedId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('seedPreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{seedPreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/seed/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "seed",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('seedPreviewIds')) {",
+         "    pm.collectionVariables.set('seedPreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
+    },
+    {
      "name": "loadFromPrimary",
      "request": {
       "auth": {
@@ -12068,6 +14424,151 @@
       }
      },
      "response": []
+    },
+    {
+     "name": "importWithPreview",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       }
+      ],
+      "body": {
+       "mode": "formdata",
+       "formdata": [
+        {
+         "key": "file",
+         "type": "file",
+         "description": "CSV or XLSX file to import (max 5MB). Column headers must match schema property names exactly.",
+         "value": ""
+        }
+       ]
+      },
+      "url": {
+       "raw": "{{baseUrl}}/soil/v1/importWithPreview",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "soil",
+        "v1",
+        "importWithPreview"
+       ]
+      },
+      "description": "Bulk import where every valid row is created with status PREVIEW (no notification is sent). The generated ids come back in result.successRecords; confirm or discard them with previewDecision. The test script saves the ids to {{soilPreviewIds}}, which previewDecision sends by default."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const body = pm.response.json();",
+         "pm.test('2xx', () => pm.response.to.be.success);",
+         "const records = (body.result && body.result.successRecords) || [];",
+         "const ids = records.map(r => r.soilId).filter(Boolean);",
+         "// Picked up by previewDecision",
+         "pm.collectionVariables.set('soilPreviewIds', JSON.stringify(ids));",
+         "pm.test('preview ids saved', () => pm.expect(ids.length).to.equal(records.length));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "previewDecision",
+     "request": {
+      "auth": {
+       "type": "apikey",
+       "apikey": [
+        {
+         "key": "key",
+         "value": "apikey",
+         "type": "string"
+        },
+        {
+         "key": "value",
+         "value": "{{api_key}}",
+         "type": "string"
+        },
+        {
+         "key": "in",
+         "value": "header",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PUT",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{jwt}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "body": {
+       "mode": "raw",
+       "raw": "{\n  \"id\": {{soilPreviewIds}},\n  \"decision\": \"confirm\"\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/soil/v1/previewDecision",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "soil",
+        "v1",
+        "previewDecision"
+       ]
+      },
+      "description": "Confirm or discard the PREVIEW records created by importWithPreview. decision: \"confirm\" (-> ACTIVE, or PENDING when the lifecycle is on) or \"discard\" (-> DELETED), case-insensitive. \"id\" (alias \"ids\") is an array of ids; by default it is the list saved by the last importWithPreview run for this catalogue, or [] if none."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "prerequest",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "// Default to an empty list when importWithPreview has not been run yet",
+         "if (!pm.collectionVariables.get('soilPreviewIds')) {",
+         "    pm.collectionVariables.set('soilPreviewIds', '[]');",
+         "}"
+        ]
+       }
+      }
+     ]
     },
     {
      "name": "loadFromPrimary",

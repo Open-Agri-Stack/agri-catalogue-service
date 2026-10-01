@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.catalogue.verg.core.config.LifecyclePolicy;
 import com.catalogue.verg.core.dto.CustomResponse;
 import com.catalogue.verg.core.dto.LifecycleRequest;
+import com.catalogue.verg.core.dto.PreviewDecisionRequest;
 import com.catalogue.verg.core.elasticsearch.dto.SearchCriteria;
 import com.catalogue.verg.marketplace.service.MarketplaceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class MarketplaceController {
 
     //@PostMapping("/v1/create")
     public ResponseEntity<CustomResponse> create(@RequestBody JsonNode marketplaceDetails) {
-        CustomResponse response = marketplaceService.createMarketplace(marketplaceDetails, null);
+        CustomResponse response = marketplaceService.createMarketplace(marketplaceDetails, null, "create", false, null);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -46,7 +47,7 @@ public class MarketplaceController {
     public ResponseEntity<CustomResponse> add(
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestBody JsonNode marketplaceDetails) {
-        CustomResponse response = marketplaceService.createMarketplace(marketplaceDetails, token);
+        CustomResponse response = marketplaceService.createMarketplace(marketplaceDetails, token, "create", false, null);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -126,6 +127,22 @@ public class MarketplaceController {
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestParam("file") MultipartFile file) {
         CustomResponse response = marketplaceService.importData(file, token);
+        return new ResponseEntity<>(response, response.getResponseCode());
+    }
+
+    @PostMapping("/v1/importWithPreview")
+    public ResponseEntity<CustomResponse> importDataWithPreview(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestParam("file") MultipartFile file) {
+        CustomResponse response = marketplaceService.importDataWithPreview(file, token);
+        return new ResponseEntity<>(response, response.getResponseCode());
+    }
+
+    @PutMapping("/v1/previewDecision")
+    public ResponseEntity<CustomResponse> previewDecision(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody PreviewDecisionRequest request) {
+        CustomResponse response = marketplaceService.decidePreview(request, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 

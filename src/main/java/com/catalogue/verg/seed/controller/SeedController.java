@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.catalogue.verg.core.config.LifecyclePolicy;
 import com.catalogue.verg.core.dto.CustomResponse;
 import com.catalogue.verg.core.dto.LifecycleRequest;
+import com.catalogue.verg.core.dto.PreviewDecisionRequest;
 import com.catalogue.verg.core.elasticsearch.dto.SearchCriteria;
 import com.catalogue.verg.seed.service.SeedService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class SeedController {
 
     //@PostMapping("/v1/create")
     public ResponseEntity<CustomResponse> create(@RequestBody JsonNode seedDetails) {
-        CustomResponse response = seedService.createSeed(seedDetails, null);
+        CustomResponse response = seedService.createSeed(seedDetails, null, "create", false, null);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -46,7 +47,7 @@ public class SeedController {
     public ResponseEntity<CustomResponse> add(
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestBody JsonNode seedDetails) {
-        CustomResponse response = seedService.createSeed(seedDetails, token);
+        CustomResponse response = seedService.createSeed(seedDetails, token, "create", false, null);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -126,6 +127,22 @@ public class SeedController {
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestParam("file") MultipartFile file) {
         CustomResponse response = seedService.importData(file, token);
+        return new ResponseEntity<>(response, response.getResponseCode());
+    }
+
+    @PostMapping("/v1/importWithPreview")
+    public ResponseEntity<CustomResponse> importDataWithPreview(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestParam("file") MultipartFile file) {
+        CustomResponse response = seedService.importDataWithPreview(file, token);
+        return new ResponseEntity<>(response, response.getResponseCode());
+    }
+
+    @PutMapping("/v1/previewDecision")
+    public ResponseEntity<CustomResponse> previewDecision(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody PreviewDecisionRequest request) {
+        CustomResponse response = seedService.decidePreview(request, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 

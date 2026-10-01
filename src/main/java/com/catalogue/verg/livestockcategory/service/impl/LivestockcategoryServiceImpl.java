@@ -12,6 +12,7 @@ import com.catalogue.verg.core.cache.CacheService;
 import com.catalogue.verg.core.config.LifecyclePolicy;
 import com.catalogue.verg.core.dto.CustomResponse;
 import com.catalogue.verg.core.dto.LifecycleRequest;
+import com.catalogue.verg.core.dto.PreviewDecisionRequest;
 import com.catalogue.verg.core.dto.RespParam;
 import com.catalogue.verg.core.elasticsearch.dto.SearchCriteria;
 import com.catalogue.verg.core.elasticsearch.dto.SearchResult;
@@ -45,8 +46,13 @@ import com.catalogue.verg.core.util.NotificationTemplateResolver;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -107,18 +113,23 @@ public class LivestockcategoryServiceImpl implements LivestockcategoryService {
     private static final String TEMPLATE_NAME = "Livestockcategory";
     private static final String TEMPLATE_CONSTANT = "LIVESTOCKCATEGORY";
 
+
+//    private static final int MAX_PREVIEW_BATCH = 500;
+
     private Logger logger = LoggerFactory.getLogger(LivestockcategoryServiceImpl.class);
 
     @Value("${spring.redis.cacheTtl}")
     private long searchResultRedisTtl;
 
     @Override
-    public CustomResponse createLivestockcategory(JsonNode livestockcategoryEntity, String token) {
+    public CustomResponse createLivestockcategory(JsonNode livestockcategoryEntity, String token, String operation, Boolean isPreviewRequired, JsonNode userContext) {
         log.info("LivestockcategoryServiceImpl::createLivestockcategory:entered the method: " + livestockcategoryEntity);
 
-        // Validate the caller's api token against the OAS auth service
-        JsonNode userContext = authValidationService.validateToken(token);
-        log.debug("LivestockcategoryServiceImpl::createLivestockcategory:token validated, user context: {}", userContext);
+        if (userContext == null) {
+            // Validate the caller's api token against the OAS auth service
+            userContext = authValidationService.validateToken(token);
+            log.debug("LivestockcategoryServiceImpl::createLivestockcategory:token validated, user context: {}", userContext);
+        }
 
         CustomResponse response = new CustomResponse();
         payloadValidation.validatePayload(Constants.LIVESTOCKCATEGORY_VALIDATION_FILE_JSON, livestockcategoryEntity);
@@ -139,7 +150,12 @@ public class LivestockcategoryServiceImpl implements LivestockcategoryService {
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             
-            String initialStatus = lifecyclePolicy.initialStatus(CATALOGUE_NAME);
+            String initialStatus;
+            if (Boolean.TRUE.equals(isPreviewRequired)) {
+                initialStatus = Constants.PREVIEW;
+            } else {
+                initialStatus = lifecyclePolicy.initialStatus(CATALOGUE_NAME);
+            }
             livestockcategoryEntity1.setCreatedOn(currentTime);
             livestockcategoryEntity1.setUpdatedOn(currentTime);
             livestockcategoryEntity1.setStatus(initialStatus);
@@ -162,12 +178,13 @@ public class LivestockcategoryServiceImpl implements LivestockcategoryService {
                     userContext.path("userId").asText(null),
                     userContext.path("userName").asText(null),
                     userContext.path("functionalRole").asText(null),
-                    "create", initialStatus,
+                    operation, initialStatus,
                     objectMapper.createObjectNode(), livestockcategoryEntity,
                     livestockcategoryEntity1.getCreatedOn(), livestockcategoryEntity1.getUpdatedOn());
 
             // Lifecycle-disabled catalogues create ACTIVE records that are never reviewed
-            if (lifecyclePolicy.isEnabledFor(CATALOGUE_NAME)) {
+            if (lifecyclePolicy.isEnabledFor(CATALOGUE_NAME) && !Boolean.TRUE.equals(isPreviewRequired) && vergProperties.isNotificationEnabled()
+                    && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
             notificationUtil.sendNotification(
                      TEMPLATE_NAME,
                      TEMPLATE_CONSTANT,
@@ -265,6 +282,7 @@ public class LivestockcategoryServiceImpl implements LivestockcategoryService {
             response.setMessage(Constants.ID_NOT_FOUND);
             return response;
         }
+        primaryKeyUtil.validateKey(Constants.LIVESTOCKCATEGORY_VALIDATION_FILE_JSON, id);
         JsonNode auditAfter = null;
         Timestamp auditCreatedOn = null;
         Timestamp auditUpdatedOn = null;
@@ -467,7 +485,7 @@ public class LivestockcategoryServiceImpl implements LivestockcategoryService {
         CustomResponse response = importService.processBulkImport(
                 file,
                 Constants.LIVESTOCKCATEGORY_VALIDATION_FILE_JSON,
-                payload -> createLivestockcategory(payload, token)   // every row is created as the calling user
+                payload -> createLivestockcategory(payload, token, "import", false, userContext)   // every row is created as the calling user
         );
 
         JsonNode importStats = objectMapper.valueToTree(response.getResult());
@@ -478,6 +496,225 @@ public class LivestockcategoryServiceImpl implements LivestockcategoryService {
                 "import", null, null, importStats, null, null);
 
         return response;
+    }
+
+    @Override
+    public CustomResponse importDataWithPreview(MultipartFile file, String token) {
+        log.info("LivestockcategoryServiceImpl :: importDataWithPreview :: started");
+
+        // Validate the caller's api token against the OAS auth service
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LivestockcategoryServiceImpl :: importDataWithPreview : token validated, user context: {}", userContext);
+
+        CustomResponse response = importService.processBulkImport(
+                file,
+                Constants.LIVESTOCKCATEGORY_VALIDATION_FILE_JSON,
+                payload -> createLivestockcategory(payload, token, "import", true, userContext)   // every row is created as the calling user
+        );
+
+        JsonNode importStats = objectMapper.valueToTree(response.getResult());
+        auditLogService.logAudit(null, CATALOGUE_NAME,
+                userContext.path("userId").asText(null),
+                userContext.path("userName").asText(null),
+                userContext.path("functionalRole").asText(null),
+                "importDataWithPreview", null, null, importStats, null, null);
+
+        return response;
+    }
+
+    @Override
+    public CustomResponse decidePreview(PreviewDecisionRequest request, String token) {
+        log.info("LivestockcategoryServiceImpl::decidePreview:entered the method");
+
+        JsonNode userContext = authValidationService.validateToken(token);
+        log.debug("LivestockcategoryServiceImpl::decidePreview:token validated, user context: {}", userContext);
+
+        CustomResponse response = new CustomResponse();
+
+        // Matched case-insensitively, in the same trim-and-fold style as LifecycleUtil.normalizeTarget
+        String decision = request == null || request.getDecision() == null
+                ? null
+                : request.getDecision().trim().toLowerCase(Locale.ROOT);
+        boolean confirm = Constants.CONFIRM.equals(decision);
+        if (!confirm && !Constants.DISCARD.equals(decision)) {
+            log.warn("LivestockcategoryServiceImpl::decidePreview:invalid decision '{}'",
+                    request == null ? null : request.getDecision());
+            response.setResponseCode(HttpStatus.BAD_REQUEST);
+            response.setMessage(Constants.INVALID_DECISION);
+            return response;
+        }
+
+        // De-duplicate up front: a repeated id would otherwise be processed twice, and the second pass
+        // would report a spurious failure because the record is no longer PREVIEW.
+        Set<String> ids = new LinkedHashSet<>();
+        if (request.getIds() != null) {
+            for (String requestedId : request.getIds()) {
+                if (StringUtils.isNotBlank(requestedId)) {
+                    ids.add(requestedId.trim());
+                }
+            }
+        }
+        if (ids.isEmpty()) {
+            log.warn("LivestockcategoryServiceImpl::decidePreview:no usable ids in the request");
+            response.setResponseCode(HttpStatus.BAD_REQUEST);
+            response.setMessage(Constants.ID_NOT_FOUND);
+            return response;
+        }
+//        if (ids.size() > MAX_PREVIEW_BATCH) {
+//            log.warn("LivestockcategoryServiceImpl::decidePreview:batch of {} exceeds the limit of {}",
+//                    ids.size(), MAX_PREVIEW_BATCH);
+//            throw new CustomException(Constants.ERROR,
+//                    "A maximum of " + MAX_PREVIEW_BATCH + " ids can be decided in one request",
+//                    HttpStatus.BAD_REQUEST);
+//        }
+
+
+        String targetStatus = confirm ? lifecyclePolicy.initialStatus(CATALOGUE_NAME) : Constants.DELETED;
+        String operation = confirm ? "confirmPreview" : "discardPreview";
+
+        List<Map<String, Object>> successRecords = new ArrayList<>();
+        List<Map<String, Object>> failureRecords = new ArrayList<>();
+        List<String> confirmedIds = new ArrayList<>();
+
+        // One lookup for the whole batch rather than a findById per id
+        Map<String, LivestockcategoryEntity> foundById = new HashMap<>();
+        for (LivestockcategoryEntity found : livestockcategoryRepository.findAllById(ids)) {
+            foundById.put(found.getLivestockcategoryId(), found);
+        }
+
+        for (String id : ids) {
+            try {
+                LivestockcategoryEntity livestockcategoryEntity1 = foundById.get(id);
+                if (livestockcategoryEntity1 == null) {
+                    log.warn("LivestockcategoryServiceImpl::decidePreview:no record found for id: {}", id);
+                    failureRecords.add(buildFailureRecord(id, Constants.INVALID_ID));
+                    continue;
+                }
+
+                if (!Constants.PREVIEW.equals(livestockcategoryEntity1.getStatus())) {
+                    log.warn("LivestockcategoryServiceImpl::decidePreview:record {} is {}, requires {}",
+                            id, livestockcategoryEntity1.getStatus(), Constants.PREVIEW);
+                    failureRecords.add(buildFailureRecord(id, Constants.INVALID_STATUS_TRANSITION));
+                    continue;
+                }
+
+                if (confirm) {
+                    applyPreviewConfirm(livestockcategoryEntity1, targetStatus, userContext, operation);
+                    confirmedIds.add(id);
+                } else {
+                    applyPreviewDiscard(livestockcategoryEntity1, userContext, operation);
+                }
+
+                Map<String, Object> successRecord = new HashMap<>();
+                successRecord.put(Constants.ID, id);
+                successRecord.put(Constants.STATUS, targetStatus);
+                successRecords.add(successRecord);
+                log.info("LivestockcategoryServiceImpl::decidePreview:record {} moved {} -> {}",
+                        id, Constants.PREVIEW, targetStatus);
+
+            } catch (Exception e) {
+                log.error("LivestockcategoryServiceImpl::decidePreview:error while processing id: {}", id, e);
+                failureRecords.add(buildFailureRecord(id, "Unexpected error: " + e.getMessage()));
+            }
+        }
+
+
+        if (confirm && !confirmedIds.isEmpty() && lifecyclePolicy.isEnabledFor(CATALOGUE_NAME)
+                && vergProperties.isNotificationEnabled()
+                && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
+            notificationUtil.sendNotification(
+                    TEMPLATE_NAME,
+                    TEMPLATE_CONSTANT,
+                    NotificationTemplateConstants.NEW_RECORD_SUBMITTED_FOR_REVIEW,
+                    Map.of(
+                            "makerName", userContext.path("userName").asText(""),
+                            "submissionId", String.join(", ", confirmedIds),
+                            "submissionDate", new Timestamp(System.currentTimeMillis()).toString()
+                    ),
+                    userContext.path("orgId").asText("")
+            );
+        }
+
+        response.getResult().put("decision", decision);
+        response.getResult().put("totalIds", ids.size());
+        response.getResult().put("successCount", successRecords.size());
+        response.getResult().put("failureCount", failureRecords.size());
+        response.getResult().put("successRecords", successRecords);
+        response.getResult().put("failureRecords", failureRecords);
+
+        if (failureRecords.isEmpty()) {
+            response.setResponseCode(HttpStatus.OK);
+            response.setMessage("Preview " + decision + " completed");
+        } else if (successRecords.isEmpty()) {
+            response.setResponseCode(HttpStatus.BAD_REQUEST);
+            response.setMessage("Preview " + decision + " failed - all ids had errors");
+        } else {
+            response.setResponseCode(HttpStatus.OK);
+            response.setMessage("Preview " + decision + " completed with some errors");
+        }
+
+        // Batch-level audit row alongside the per-id ones, mirroring importData
+        auditLogService.logAudit(null, CATALOGUE_NAME,
+                userContext.path("userId").asText(null),
+                userContext.path("userName").asText(null),
+                userContext.path("functionalRole").asText(null),
+                operation, null, null,
+                objectMapper.valueToTree(response.getResult()), null, null);
+
+        log.info("LivestockcategoryServiceImpl::decidePreview:{} completed. Total: {}, Success: {}, Failures: {}",
+                decision, ids.size(), successRecords.size(), failureRecords.size());
+        return response;
+    }
+
+
+    private void applyPreviewConfirm(LivestockcategoryEntity livestockcategoryEntity1, String targetStatus, JsonNode userContext,
+                                     String operation) throws IOException {
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        livestockcategoryEntity1.setStatus(targetStatus);
+        livestockcategoryEntity1.setUpdatedOn(currentTime);
+        livestockcategoryRepository.save(livestockcategoryEntity1);
+
+        ObjectNode jsonNode = buildDocument(livestockcategoryEntity1.getData(), targetStatus,
+                livestockcategoryEntity1.getCreatedOn(), currentTime);
+        Map<String, Object> map = objectMapper.convertValue(jsonNode, Map.class);
+        esUtilService.updateDocument(Constants.LIVESTOCKCATEGORY_INDEX_NAME, Constants.INDEX_TYPE,
+                livestockcategoryEntity1.getLivestockcategoryId(), map, vergProperties.getElasticLivestockcategoryJsonPath());
+        cacheService.putCache(livestockcategoryEntity1.getLivestockcategoryId(), jsonNode);
+
+        auditLogService.logAudit(livestockcategoryEntity1.getLivestockcategoryId(), CATALOGUE_NAME,
+                userContext.path("userId").asText(null),
+                userContext.path("userName").asText(null),
+                userContext.path("functionalRole").asText(null),
+                operation, targetStatus,
+                livestockcategoryEntity1.getData(), livestockcategoryEntity1.getData(),
+                livestockcategoryEntity1.getCreatedOn(), livestockcategoryEntity1.getUpdatedOn());
+    }
+
+
+    private void applyPreviewDiscard(LivestockcategoryEntity livestockcategoryEntity1, JsonNode userContext, String operation)
+            throws IOException {
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        livestockcategoryEntity1.setStatus(Constants.DELETED);
+        livestockcategoryEntity1.setUpdatedOn(currentTime);
+        livestockcategoryRepository.save(livestockcategoryEntity1);
+
+        esUtilService.deleteDocument(livestockcategoryEntity1.getLivestockcategoryId(), Constants.LIVESTOCKCATEGORY_INDEX_NAME);
+        cacheService.deleteCache(livestockcategoryEntity1.getLivestockcategoryId());
+
+        auditLogService.logAudit(livestockcategoryEntity1.getLivestockcategoryId(), CATALOGUE_NAME,
+                userContext.path("userId").asText(null),
+                userContext.path("userName").asText(null),
+                userContext.path("functionalRole").asText(null),
+                operation, Constants.DELETED,
+                livestockcategoryEntity1.getData(), livestockcategoryEntity1.getData(),
+                livestockcategoryEntity1.getCreatedOn(), livestockcategoryEntity1.getUpdatedOn());
+    }
+
+    private Map<String, Object> buildFailureRecord(String id, String error) {
+        Map<String, Object> failureRecord = new HashMap<>();
+        failureRecord.put(Constants.ID, id);
+        failureRecord.put("errors", error);
+        return failureRecord;
     }
 
     @Override
@@ -618,6 +855,8 @@ public class LivestockcategoryServiceImpl implements LivestockcategoryService {
                     auditBefore, livestockcategoryEntity,
                     livestockcategoryEntity1.getCreatedOn(), livestockcategoryEntity1.getUpdatedOn());
 
+            if (vergProperties.isNotificationEnabled()
+                    && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
             notificationUtil.sendNotification(
                  TEMPLATE_NAME,
                  TEMPLATE_CONSTANT,
@@ -629,6 +868,7 @@ public class LivestockcategoryServiceImpl implements LivestockcategoryService {
                  ),
                  userContext.path("orgId").asText(null)
             );
+            }
             return response;
         } catch (Exception e) {
             throw new CustomException("error while processing", e.getMessage(),
@@ -789,6 +1029,8 @@ public class LivestockcategoryServiceImpl implements LivestockcategoryService {
                     livestockcategoryEntity1.getData(), livestockcategoryEntity1.getData(),
                     livestockcategoryEntity1.getCreatedOn(), livestockcategoryEntity1.getUpdatedOn());
 
+            if (vergProperties.isNotificationEnabled()
+                    && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
              List<NotificationTemplate> templates = NotificationTemplateResolver.resolveDecisionTemplates(
                       operation,
                       targetStatus
@@ -806,6 +1048,7 @@ public class LivestockcategoryServiceImpl implements LivestockcategoryService {
                 userContext.path("orgId").asText(null)
              );
              }
+            }
             return response;
         } catch (Exception e) {
             throw new CustomException("error while processing", e.getMessage(),

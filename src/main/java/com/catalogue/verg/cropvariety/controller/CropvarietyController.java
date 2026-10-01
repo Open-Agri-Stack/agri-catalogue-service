@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.catalogue.verg.core.config.LifecyclePolicy;
 import com.catalogue.verg.core.dto.CustomResponse;
 import com.catalogue.verg.core.dto.LifecycleRequest;
+import com.catalogue.verg.core.dto.PreviewDecisionRequest;
 import com.catalogue.verg.core.elasticsearch.dto.SearchCriteria;
 import com.catalogue.verg.cropvariety.service.CropvarietyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class CropvarietyController {
 
     //@PostMapping("/v1/create")
     public ResponseEntity<CustomResponse> create(@RequestBody JsonNode cropvarietyDetails) {
-        CustomResponse response = cropvarietyService.createCropvariety(cropvarietyDetails, null);
+        CustomResponse response = cropvarietyService.createCropvariety(cropvarietyDetails, null, "create", false, null);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -46,7 +47,7 @@ public class CropvarietyController {
     public ResponseEntity<CustomResponse> add(
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestBody JsonNode cropvarietyDetails) {
-        CustomResponse response = cropvarietyService.createCropvariety(cropvarietyDetails, token);
+        CustomResponse response = cropvarietyService.createCropvariety(cropvarietyDetails, token, "create", false, null);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
@@ -126,6 +127,22 @@ public class CropvarietyController {
             @RequestHeader(value = "Authorization", required = false) String token,
             @RequestParam("file") MultipartFile file) {
         CustomResponse response = cropvarietyService.importData(file, token);
+        return new ResponseEntity<>(response, response.getResponseCode());
+    }
+
+    @PostMapping("/v1/importWithPreview")
+    public ResponseEntity<CustomResponse> importDataWithPreview(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestParam("file") MultipartFile file) {
+        CustomResponse response = cropvarietyService.importDataWithPreview(file, token);
+        return new ResponseEntity<>(response, response.getResponseCode());
+    }
+
+    @PutMapping("/v1/previewDecision")
+    public ResponseEntity<CustomResponse> previewDecision(
+            @RequestHeader(value = "Authorization", required = false) String token,
+            @RequestBody PreviewDecisionRequest request) {
+        CustomResponse response = cropvarietyService.decidePreview(request, token);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
