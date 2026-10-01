@@ -1,11 +1,13 @@
 package com.catalogue.verg.core.util;
 
+import com.catalogue.verg.core.exception.CustomException;
 import com.datastax.oss.driver.api.core.uuid.Uuids;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
@@ -27,6 +29,24 @@ public class PrimaryKeyUtil {
         String prefix = extractPrefix(primaryKeyProperty);
         int keyLength = extractKeyLength(primaryKeyProperty);
         return buildKey(prefix, keyLength);
+    }
+
+    /**
+     * Rejects an id whose prefix does not match the primary-key prefix declared in the schema
+     * (e.g. a seed id sent to the season read endpoint). No-op when the schema declares no
+     * prefix, since those ids are time-based UUIDs.
+     */
+    public void validateKey(String fileName, String id) {
+        String prefix = extractPrefix(extractPrimaryKeyProperty(fileName));
+        if (prefix == null) {
+            log.debug("PrimaryKeyUtil::validateKey::no prefix declared in schema: {}, skipping", fileName);
+            return;
+        }
+        if (id == null || !id.startsWith(prefix)) {
+            log.warn("PrimaryKeyUtil::validateKey::id {} does not match prefix {} from schema {}", id, prefix, fileName);
+            throw new CustomException(Constants.ERROR,
+                    Constants.INVALID_ID + ": expected prefix '" + prefix + "'", HttpStatus.BAD_REQUEST);
+        }
     }
 
 //    public String generateKey(String fileName, int keyLength) {

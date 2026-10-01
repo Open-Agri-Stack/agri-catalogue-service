@@ -3,6 +3,7 @@ package com.catalogue.verg.season.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.catalogue.verg.core.dto.CustomResponse;
 import com.catalogue.verg.core.dto.LifecycleRequest;
+import com.catalogue.verg.core.dto.PreviewDecisionRequest;
 import com.catalogue.verg.core.elasticsearch.dto.SearchCriteria;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface SeasonService {
 
     // token: the raw Authorization header from the caller
-    CustomResponse createSeason(JsonNode seasonEntity, String token);
+    CustomResponse createSeason(JsonNode seasonEntity, String token, String operation, Boolean isPreviewRequired, JsonNode userContext);
 
     CustomResponse updateSeason(String id, JsonNode seasonEntity);
 
@@ -38,6 +39,10 @@ public interface SeasonService {
     CustomResponse delete(String id, String token);
 
     CustomResponse importData(MultipartFile file, String token);
+
+    CustomResponse importDataWithPreview(MultipartFile file, String token);
+
+    CustomResponse decidePreview(PreviewDecisionRequest request, String token);
 
     // Drops the ES index and rebuilds it from the primary store (Postgres); skips DELETED records
     CustomResponse loadFromPrimarySeason();

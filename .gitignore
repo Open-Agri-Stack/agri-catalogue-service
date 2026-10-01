@@ -125,3 +125,7 @@ LEARNING-PATH.md
 #===== postman =====
 # local collection is per-developer: own baseUrl, tokens and scratch requests
 postman/agri-catalogue-service.local.postman_collection.json
+
+
+# local secrets
+.env

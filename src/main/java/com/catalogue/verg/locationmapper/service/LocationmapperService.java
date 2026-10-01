@@ -3,6 +3,7 @@ package com.catalogue.verg.locationmapper.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.catalogue.verg.core.dto.CustomResponse;
 import com.catalogue.verg.core.dto.LifecycleRequest;
+import com.catalogue.verg.core.dto.PreviewDecisionRequest;
 import com.catalogue.verg.core.elasticsearch.dto.SearchCriteria;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface LocationmapperService {
 
     // token: the raw Authorization header from the caller
-    CustomResponse createLocationmapper(JsonNode locationmapperEntity, String token);
+    CustomResponse createLocationmapper(JsonNode locationmapperEntity, String token, String operation, Boolean isPreviewRequired, JsonNode userContext);
 
     CustomResponse updateLocationmapper(String id, JsonNode locationmapperEntity);
 
@@ -38,6 +39,10 @@ public interface LocationmapperService {
     CustomResponse delete(String id, String token);
 
     CustomResponse importData(MultipartFile file, String token);
+
+    CustomResponse importDataWithPreview(MultipartFile file, String token);
+
+    CustomResponse decidePreview(PreviewDecisionRequest request, String token);
 
     // Drops the ES index and rebuilds it from the primary store (Postgres); skips DELETED records
     CustomResponse loadFromPrimaryLocationmapper();
