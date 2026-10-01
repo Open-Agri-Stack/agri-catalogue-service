@@ -148,7 +148,6 @@ public class CroptypeServiceImpl implements CroptypeService {
             }
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            
             String initialStatus;
             if (Boolean.TRUE.equals(isPreviewRequired)) {
                 initialStatus = Constants.PREVIEW;
@@ -184,14 +183,14 @@ public class CroptypeServiceImpl implements CroptypeService {
             // Lifecycle-disabled catalogues create ACTIVE records that are never reviewed
             if (lifecyclePolicy.isEnabledFor(CATALOGUE_NAME) && !Boolean.TRUE.equals(isPreviewRequired) && vergProperties.isNotificationEnabled()
                     && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
-            notificationUtil.sendNotification(
-                     TEMPLATE_NAME,
-                     TEMPLATE_CONSTANT,
-                     NotificationTemplateConstants.NEW_RECORD_SUBMITTED_FOR_REVIEW,
-                     Map.of(
-                      "makerName", userContext.path("userName").asText(null),
-                      "submissionId", primaryID,
-                      "submissionDate", currentTime.toString()
+                notificationUtil.sendNotification(
+                        TEMPLATE_NAME,
+                        TEMPLATE_CONSTANT,
+                        NotificationTemplateConstants.NEW_RECORD_SUBMITTED_FOR_REVIEW,
+                        Map.of(
+                                "makerName", userContext.path("userName").asText(null),
+                                "submissionId", primaryID,
+                                "submissionDate", currentTime.toString()
                         ),
                         userContext.path("orgId").asText(null)
                 );
@@ -853,17 +852,17 @@ public class CroptypeServiceImpl implements CroptypeService {
 
             if (vergProperties.isNotificationEnabled()
                     && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
-            notificationUtil.sendNotification(
-                    TEMPLATE_NAME,
-                    TEMPLATE_CONSTANT,
-                    NotificationTemplateConstants.NEW_RECORD_SUBMITTED_FOR_REVIEW,
-                    Map.of(
-                            "makerName", userContext.path("userName").asText(null),
-                            "submissionId", id,
-                            "submissionDate", currentTime.toString()
-                    ),
-                    userContext.path("orgId").asText(null)
-            );
+                notificationUtil.sendNotification(
+                        TEMPLATE_NAME,
+                        TEMPLATE_CONSTANT,
+                        NotificationTemplateConstants.NEW_RECORD_SUBMITTED_FOR_REVIEW,
+                        Map.of(
+                                "makerName", userContext.path("userName").asText(null),
+                                "submissionId", id,
+                                "submissionDate", currentTime.toString()
+                        ),
+                        userContext.path("orgId").asText(null)
+                );
             }
             return response;
         } catch (Exception e) {
@@ -1030,23 +1029,23 @@ public class CroptypeServiceImpl implements CroptypeService {
 
             if (vergProperties.isNotificationEnabled()
                     && StringUtils.isNotBlank(userContext.path("orgId").asText(null))) {
-             List<NotificationTemplate> templates = NotificationTemplateResolver.resolveDecisionTemplates(
-                      operation,
-                      targetStatus
-              );
-             for (NotificationTemplate template : templates) {
-              notificationUtil.sendNotification(
-                TEMPLATE_NAME,
-                TEMPLATE_CONSTANT,
-                template,
-                Map.of(
-                        "makerName", userContext.path("userName").asText(null),
-                        "submissionId", id,
-                        "actionDate", currentTime.toString()
-                ),
-                userContext.path("orgId").asText(null)
-             );
-             }
+                List<NotificationTemplate> templates = NotificationTemplateResolver.resolveDecisionTemplates(
+                        operation,
+                        targetStatus
+                );
+                for (NotificationTemplate template : templates) {
+                    notificationUtil.sendNotification(
+                            TEMPLATE_NAME,
+                            TEMPLATE_CONSTANT,
+                            template,
+                            Map.of(
+                                    "makerName", userContext.path("userName").asText(null),
+                                    "submissionId", id,
+                                    "actionDate", currentTime.toString()
+                            ),
+                            userContext.path("orgId").asText(null)
+                    );
+                }
             }
             return response;
         } catch (Exception e) {
