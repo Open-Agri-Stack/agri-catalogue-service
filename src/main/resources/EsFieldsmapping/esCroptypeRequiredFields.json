@@ -1,41 +1,74 @@
 {
-    "cropTypeId": {
-        "type": "keyword"
-    },
-    "cropCategoryId": {
-        "type": "keyword"
-    },
-    "cropCategoryName": {
-        "type": "keyword"
-    },
-    "name": {
-        "type": "keyword"
-    },
-    "scientificName": {
-        "type": "keyword"
-    },
-    "centre": {
-        "type": "keyword"
-    },
-    "varietiesCount": {
-        "type": "integer"
-    },
-    "description": {
-        "type": "text"
-    },
-    "status": {
-        "type": "keyword"
-    },
-    "createdOn": {
-        "type": "date"
-    },
-    "updatedOn": {
-        "type": "date"
-    },
-    "createdBy": {
-        "type": "keyword"
-    },
-    "updatedBy": {
-        "type": "keyword"
-    }
+  "cropTypeId": {
+    "type": "keyword"
+  },
+  "cropCategoryId": {
+    "type": "keyword"
+  },
+  "cropCategoryName": {
+    "type": "keyword"
+  },
+  "name": {
+    "type": "keyword"
+  },
+  "scientificName": {
+    "type": "keyword"
+  },
+  "centre": {
+    "type": "keyword"
+  },
+  "varietiesCount": {
+    "type": "integer"
+  },
+  "description": {
+    "type": "text"
+  },
+  "status": {
+    "type": "keyword"
+  },
+  "createdOn": {
+    "type": "date"
+  },
+  "updatedOn": {
+    "type": "date"
+  },
+  "createdBy": {
+    "type": "keyword"
+  },
+  "updatedBy": {
+    "type": "keyword"
+  },
+  "createdByName": {
+    "type": "keyword"
+  },
+  "updatedByName": {
+    "type": "keyword"
+  },
+  "approvedBy": {
+    "type": "keyword"
+  },
+  "approvedByName": {
+    "type": "keyword"
+  },
+  "approvedOn": {
+    "type": "date"
+  },
+  "reviewedBy": {
+    "type": "keyword"
+  },
+  "reviewedByName": {
+    "type": "keyword"
+  },
+  "reviewedOn": {
+    "type": "date"
+  },
+  "rejectedBy": {
+    "type": "keyword"
+  },
+  "rejectedByName": {
+    "type": "keyword"
+  },
+  "rejectedOn": {
+    "type": "date"
+  }
 }
